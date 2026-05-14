@@ -43,6 +43,6 @@ const debtSchema = new mongoose.Schema({
     }
 }, {timestamps: true})
 
-const Debt = mongoose.model("Debt", debtSchema);
+export const Debt = mongoose.model("Debt", debtSchema);
+export const Items = mongoose.model("Items", itemSchema);
 
-export default Debt;

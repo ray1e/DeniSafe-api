@@ -1,5 +1,5 @@
 import {Router} from "express";
-import { createDebt, getAllDebts, getCustomerDebts, updateDebtDetails } from "../controllers/debts.controller.js";
+import { createDebt, getAllDebts, getCustomerDebts, updateDebtDetails, deleteDebt } from "../controllers/debts.controller.js";
 
 const DebtRouter = Router();
 
@@ -16,6 +16,6 @@ DebtRouter.get("/:id", getCustomerDebts);
 DebtRouter.patch("/:id", updateDebtDetails);
 
 //DELETE a customers debt
-DebtRouter.delete("/:id", (req, res) => {});
+DebtRouter.delete("/:id", deleteDebt);
 
 export default DebtRouter;

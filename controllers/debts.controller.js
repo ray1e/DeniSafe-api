@@ -1,3 +1,4 @@
+import { truncates } from "bcryptjs";
 import { Debt } from "../models/debts.model.js";
 
 export const createDebt = async (req, res, next) => {
@@ -35,12 +36,22 @@ export const updateDebtDetails = async (req, res, next) => {
 
         let debt;
         if (addItem) {
-            debt = await Debt.findByIdAndUpdate(req.params.id, {$push: {items: updateData}}, {runValidators: true, returnDocument: "after"});
+            debt = await Debt.findByIdAndUpdate(req.params.id, { $push: { items: updateData } }, { runValidators: true, new: true });
         } else {
-            debt = await Debt.findByIdAndUpdate(req.params.id , { $set: updateData});
+            debt = await Debt.findByIdAndUpdate(req.params.id, { $set: updateData }, {returnDocument: "after"});
         }
 
-        res.status(200).json({ success: true, data: debt});
+        res.status(200).json({ success: true, data: debt });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export const deleteDebt = async (req, res, next) => {
+    try {
+        await Debt.findByIdAndUpdate(req.params.id, {$set: {debtActive: false}});
+
+        res.status(200).json({success: true, message:"successfuly deleted debt"});
     } catch (error) {
         next(error);
     }

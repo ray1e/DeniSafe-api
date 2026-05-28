@@ -1,6 +1,6 @@
 import express from "express";
 import DebtRouter from "./routes/debts.routes.js";
-import connectToDatabase from "../DeniSafe/database/mongodb.js";
+import connectToDatabase from "./database/mongodb.js";
 import errorMiddleware from "./middlewares/error.middleware.js";
 
 const app = express();

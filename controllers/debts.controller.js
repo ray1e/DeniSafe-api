@@ -38,7 +38,7 @@ export const updateDebtDetails = async (req, res, next) => {
         if (action == addItem) {
             debt = await Debt.findByIdAndUpdate(req.params.debtId, { $push: { items: updateData } }, { runValidators: true, new: true });
         } else {
-            debt = await Debt.findByIdAndUpdate(req.params.debtId, { $set: updateData }, {returnDocument: "after"});
+            debt = await Debt.findByIdAndUpdate(req.params.debtId, { $set: updateData }, { returnDocument: "after" });
         }
 
         res.status(200).json({ success: true, data: debt });
@@ -49,19 +49,19 @@ export const updateDebtDetails = async (req, res, next) => {
 
 export const deleteDebt = async (req, res, next) => {
     try {
-        await Debt.findByIdAndUpdate(req.params.debtId, {$set: {debtActive: false}});
+        await Debt.findByIdAndUpdate(req.params.debtId, { $set: { debtActive: false } });
 
-        res.status(200).json({success: true, message:"successfuly deleted debt"});
+        res.status(200).json({ success: true, message: "successfuly deleted debt" });
     } catch (error) {
         next(error);
     }
 }
- 
+
 export const updateItemDetails = async (req, res, next) => {
     try {
-        const {debtId, itemId} = req.params;
-        const {name, price, quantity} = req.body;
-        const updates = {name, price, quantity};
+        const { debtId, itemId } = req.params;
+        const { name, price, quantity } = req.body;
+        const updates = { name, price, quantity };
 
         const setObject = {};
 
@@ -70,16 +70,35 @@ export const updateItemDetails = async (req, res, next) => {
         }
 
         const debt = await Debt.findByIdAndUpdate(
-            debtId, 
-            {$set: setObject},
+            debtId,
+            { $set: setObject },
             {
-                arrayFilters: [{"item._id": itemId}],
+                arrayFilters: [{ "item._id": itemId }],
                 returnDocument: "after",
                 runValidators: true
             }
         );
 
-        res.status(200).json({successful: true, message: "item updated", data: debt});
+        res.status(200).json({ successful: true, message: "item updated", data: debt });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export const deleteItems = async (req, res, next) => {
+    try {
+        const { debtId, itemId } = req.params;
+        const debt = await Debt.findByIdAndUpdate(
+            { _id: debtId },
+            {
+                $pull: {items: {_id: itemId} },
+                
+            },
+            {
+                returnDocument: "after"
+            }
+        );
+        res.status(200).json({ successful: true, message: "item deleted", data: debt });
     } catch (error) {
         next(error);
     }

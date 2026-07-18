@@ -59,3 +59,13 @@ typings/
 
 # next.js build output
 .next
+# Vite / build output
+dist/
+.vite/
+
+# Local environment files
+.env*
+!.env.example
+
+# Optional editor settings
+.vscode/

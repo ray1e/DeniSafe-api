@@ -1,1 +1,21 @@
 @import "tailwindcss";
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: #f8fafc;
+}
+
+@theme {
+  --color-brand-bg: #f8fafc;     /* slate-50: A soft, premium off-white */
+  --color-brand-accent: #4f46e5; /* indigo-600: A sleek corporate blue/indigo */
+  --color-brand-text: #0f172a;   /* slate-900: Deep charcoal for high-contrast, easy reading */
+  --color-brand-action: #b91c1c;
+  --color-brand-action-text: #ffffff;
+  --color-brand-graytext: #99a1af;
+  --color-brand-items-separator: rgb(226, 232, 240); /*slate-200*/
+}

@@ -1,8 +1,11 @@
 import QuickActions from "./QuickActions"
 import StatItem from "./StatItem"
-
+import { useState } from "react"
+import AddCustomerModal from "./AddCustomerModal"
 
 function Header () {
+    const [isModalOpen, setIsModalOpen] = useState(false)
+
     return(
         <div className="flex flex-row items-center justify-between border-b py-4 px-2">
             {/*app branding */}
@@ -20,7 +23,13 @@ function Header () {
                 <StatItem value="5" label="CUSTOMERS" className="text-brand-text"/>
             </div>
             <QuickActions
-                label="+ New Customer" className="min-h-10 min-w-5 px-3 py-2"
+                label="+ New Customer"
+                className="min-h-10 min-w-5 px-3 py-2"
+                onClick={() => setIsModalOpen(true)}
+            />
+            <AddCustomerModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
             />
         </div>
     )

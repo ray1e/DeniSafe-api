@@ -18,4 +18,21 @@ body {
   --color-brand-action-text: #ffffff;
   --color-brand-graytext: #99a1af;
   --color-brand-items-separator: rgb(226, 232, 240); /*slate-200*/
+  --color-brand-red-border: rgb(185, 28, 28); /*red-700*/
+  --color-brand-card: #f2f2f2;
+
+  --color-brand-background: #ffffff;
+  --color-brand-foreground: #111111;
+  --color-brand-card: #f8f8f8;
+  --color-brand-card-border: #e8e8e8;
+  --color-brand-muted: #f2f2f2;
+  --color-brand-muted-fg: #888888;
+  --color-brand-border: #e2e2e2;
+  --color-brand-primary: #b91c1c;
+  --color-brand-primary-hover: #991b1b;
+  --color-brand-primary-fg: #ffffff;
+  --color-brand-success: #166534;
+  --color-brand-success-bg: #f0fdf4;
+  --color-brand-warning-bg: #fefce8;
+  --color-brand-warning: #854d0e;
 }

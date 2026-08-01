@@ -14,6 +14,10 @@ const itemSchema = new mongoose.Schema({
     quantity: {
         type: Number,
         default: 1
+    },
+    note: {
+        type: String,
+        trim: true
     }
 })
 

@@ -3,10 +3,22 @@ import { Debt } from "../models/debts.model.js";
 
 export const createDebt = async (req, res, next) => {
     try {
+        const { name, dateTaken, date, items, itemName, price, quantity, note, ...rest } = req.body;
+
+        const normalizedItems = Array.isArray(items) && items.length > 0
+            ? items
+            : itemName
+                ? [{ name: itemName, price: Number(price) || 0, quantity: Number(quantity) || 1, note: note}]
+                : [];
+
         const debt = await Debt.create({
-            ...req.body,
+            name: name?.trim() || "Unnamed customer",
+            dateTaken:  date ? new Date(date) : new Date(),
+            items: normalizedItems,
+            ...rest,
         });
-        res.status(201).json({ success: true, data: debt })
+
+        res.status(201).json({ success: true, data: debt });
     } catch (error) {
         next(error);
     }

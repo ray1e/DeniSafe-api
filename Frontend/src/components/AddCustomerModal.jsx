@@ -1,31 +1,23 @@
 import { useState } from "react";
 import DebtForm from "./DebtForm";
+import { useCustomers } from "./CustomerContext";
+import { useDebt } from "./DebtContext";
 
 function AddCustomerModal({ isOpen, onClose }) {
-  const today = new Date().toISOString().split("T")[0];
 
-  const [customerData, setCustomerData] = useState({
-    name: "",
-    note: "",
-  });
-  const [debtData, setDebtData] = useState([
-    {
-      itemName: "",
-      price: "",
-      quantity: "",
-      date: today,
-    },
-  ]);
+  
+  const {customerData, setCustomerData} = useCustomers();
+  const {today, debtData} = useDebt();
 
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
+
+  if (!isOpen) return null;
 
   const isFormValid =
     customerData.name.trim() !== "" &&
     debtData.every(
       (item) => item.itemName.trim() !== "" && item.price.trim() !== "",
     );
-
-  if (!isOpen) return null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -99,11 +91,7 @@ function AddCustomerModal({ isOpen, onClose }) {
                 className="w-full bg-white rounded-md border border-brand-border px-3 py-2 text-sm focus:border-brand-primary focus:outline-none "
               />
             </div>
-            <DebtForm
-              debtData={debtData}
-              setDebtData={setDebtData}
-              today={today}
-            />
+            <DebtForm/>
             <div>
               <label className="block text-sm font-normal text-brand-muted-fg uppercase mb-1">
                 NOTE (OPTIONAL)

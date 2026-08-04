@@ -1,7 +1,7 @@
 import CustomerStat from "./CustomerStat";
 import StatusTabs from "./StatusTabs";
 
-function CustomerProfile() {
+function CustomerProfile({onOpenDebtModal}) {
   return (
     <div className="flex flex-col gap-1">
       {/*customer detail and debt balance */}
@@ -33,7 +33,7 @@ function CustomerProfile() {
       </div>
 
       {/*customer debt history */}
-      <StatusTabs/>
+      <StatusTabs onOpenDebtModal={onOpenDebtModal}/>
     </div>
   );
 }

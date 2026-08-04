@@ -1,6 +1,9 @@
 import QuickActions from "./QuickActions";
+import { useModal } from "./DebtModalContext";
 
 function StatusTabs() {
+  const {openDebtModal} = useModal();
+  
   return (
     <div className="flex gap-4 border-b border-brand-items-separator pr-4 py-2 pl-9 items-center justify-between">
       <div className="flex gap-9">
@@ -15,6 +18,7 @@ function StatusTabs() {
       <QuickActions
         label="+ New Debt"
         className="min-h-5 min-w-15 text-xs px-2 py-1"
+        onClick = {openDebtModal}
       />
     </div>
   );

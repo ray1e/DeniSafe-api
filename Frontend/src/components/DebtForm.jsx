@@ -1,4 +1,10 @@
-function DebtForm({ debtData, setDebtData, today }) {
+import { useContext } from "react";
+import { useDebt } from "./DebtContext";
+
+function DebtForm() {
+  const {debtData, setDebtData, today} = useDebt();
+
+
   const handleAddOtherItem = () => {
     setDebtData([
       ...debtData,

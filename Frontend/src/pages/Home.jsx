@@ -1,26 +1,26 @@
 import ActiveDebtTab from "../components/ActiveDebtTab";
+import { CustomerProvider } from "../components/CustomerProvider";
 import CustomerListing from "../components/CustomerListing";
 import CustomerProfile from "../components/CustomerProfile";
-import Header from "../components/Header"
+import { DebtProvider } from "../components/DebtProvider";
+import FullCustomerDashboard from "../components/FullCustomerDashboard";
+import Header from "../components/Header";
+import { ModalProvider } from "../components/ModalProvider";
 
-function Home () {
-    return(
-        <div>
-            <Header/>
-            <main className="flex flex-col md:flex-row w-full min-h-screen">
-                <div className="md:w-85 md:shrink-0 w-full">
-                  <CustomerListing/>  
-                </div>
-                
-                <div className="flex-1 min-w-0 gap-3 flex flex-col">
-                   <CustomerProfile/> 
-                   <ActiveDebtTab/>
-                </div>
-                
-            </main>
-            
-        </div>
-    )
+function Home() {
+  return (
+    <div>
+      <main>
+        <CustomerProvider>
+            <DebtProvider>
+              <ModalProvider>
+                <FullCustomerDashboard />
+              </ModalProvider>
+            </DebtProvider>
+        </CustomerProvider>
+      </main>
+    </div>
+  );
 }
 
 export default Home;

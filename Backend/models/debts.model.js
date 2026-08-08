@@ -15,42 +15,51 @@ const itemSchema = new mongoose.Schema({
     type: Number,
     default: 1,
   },
+});
+
+const debtSchema = new mongoose.Schema({
+  dateTaken: {
+    type: Date,
+    required: true,
+    validate: {
+      validator: (value) => value <= new Date(),
+      message: "Date cannot be in the future",
+    },
+  },
+
+  items: [itemSchema],
+
+  totalAmount: {
+    type: Number,
+    default: 0,
+  },
+
   note: {
     type: String,
     trim: true,
   },
+
+  debtActive: {
+    type: Boolean,
+    default: true,
+  },
 });
 
-const debtSchema = new mongoose.Schema(
+const customerSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+    trim: true,
+    minLength: 2,
+    maxLength: 50,
+  },
+});
+
+const accountSchema = new mongoose.Schema(
   {
-    name: {
-      type: String,
-      required: true,
-      trim: true,
-      minLength: 2,
-      maxLength: 50,
-    },
+    name: customerSchema,
 
-    dateTaken: {
-      type: Date,
-      required: true,
-      validate: {
-        validator: (value) => value <= new Date(),
-        message: "Date cannot be in the future",
-      },
-    },
-
-    items: [itemSchema],
-
-    debtActive: {
-      type: Boolean,
-      default: false,
-    },
-
-    totalAmount: {
-      type: Number,
-      default: 0,
-    },
+    debts: [debtSchema],
   },
   { timestamps: true },
 );
@@ -58,20 +67,24 @@ const debtSchema = new mongoose.Schema(
 debtSchema.pre("findOneAndUpdate", function () {
   const update = this.getUpdate();
   const items = update.items || update.$set.items;
-  if (items || Array.isArray(items)) {  
+  if (items || Array.isArray(items)) {
     const total = items.reduce((sum, item) => {
-      return sum + (item.price * item.quantity);
+      return sum + item.price * item.quantity;
     }, 0);
     this.set({ totalAmount: total });
   }
 });
 
-debtSchema.pre('save', function () {
-  if (this.items && Array.isArray(this.items)) {
-    this.totalAmount = this.items.reduce((sum, item) => {
-      return sum + (item.price * (item.quantity));
-    }, 0);
-    console.log("Hook processing items:", this.items)
+// calculate totalamount before saving
+debtSchema.pre("save", function () {
+  if (this.debts && Array.isArray(this.debts)) {
+    this.debts.forEach(debt => {
+      if (debt.items && Array.isArray(debt.items)) {
+        debt.totalAmount = debt.items.reduce((sum, item) => {
+          return sum + (item.price * item.quantity);
+        }, 0)
+      }
+    });
   }
 });
 

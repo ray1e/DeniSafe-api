@@ -3,8 +3,9 @@ import { Debt } from "../models/debts.model.js";
 
 export const createDebt = async (req, res, next) => {
   try {
-    const { name, dateTaken, note, items, ...rest } = req.body;
-
+    const { name, dateTaken, note, items} = req.body;
+    
+    //normalize request body to match expected model and validate fields
     const normalizedDebtData = (items || []).map(({ itemName, ...item }) => ({
       ...item,
       name: itemName,
@@ -20,11 +21,16 @@ export const createDebt = async (req, res, next) => {
 
     const payload = {
       name,
-      items: normalizedDebtData,
+      debts: {
+        items: normalizedDebtData,
+        dateTaken,
+        note
+      }  
+    };
+    /*items: normalizedDebtData,
       dateTaken,
       note,
-      ...rest,
-    };
+      ...rest,*/
     const debt = await Debt.create(payload);
 
     res.status(201).json({ success: true, data: debt });

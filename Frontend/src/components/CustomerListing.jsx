@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { fetchDebts } from "../services/api";
 
-function CustomerListing() {
+function CustomerListing({onSelectCustomer}) {
   const [debts, setDebts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -16,7 +16,7 @@ function CustomerListing() {
         if (isMounted && debtResponse?.success) {
           setDebts(debtResponse.data ?? []);
         } else if (isMounted) {
-          setError(debtResponse?.message || "Failed to get debts");
+          setError("Failed to get debts");
         }
       } catch (err) {
         if (isMounted) {
@@ -67,7 +67,7 @@ function CustomerListing() {
           debts.map((debt) => {
             const initials = getInitials(debt.name);
             return (
-              <div key={debt._id} className="flex p-3 border-b border-brand-items-separator justify-between">
+              <div key={debt._id} onClick={() => onSelectCustomer(debt._id)} className="flex p-3 border-b border-brand-items-separator cursor-default justify-between hover:bg-brand-card">
                 <div className="flex gap-3">
                   {/*Initials avatar*/}
                   <span className="flex w-8 h-8 rounded-full bg-blue-700 justify-center items-center text-xs text-white">

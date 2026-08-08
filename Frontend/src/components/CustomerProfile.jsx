@@ -1,7 +1,40 @@
+import { useEffect, useState } from "react";
 import CustomerStat from "./CustomerStat";
 import StatusTabs from "./StatusTabs";
+import { fetchDebts } from "../services/api";
 
-function CustomerProfile({onOpenDebtModal}) {
+function CustomerProfile({ onOpenDebtModal, selectedCustomerId }) {
+  const [loading, setLoading] = useState(true);
+  const [debt, setDebts] = useState([]);
+  const [error, setError] = useState(null);
+  useEffect(() => {
+    if (!selectedCustomerId) return;
+
+    const getDebts = async () => {
+      setLoading(true);
+      setError(null);
+      //fetch customer debts
+      try {
+        const debtResponse = await fetch(`http://localhost:3000/api/v1/debts/${selectedCustomerId}`);
+        const debtData = await debtResponse.json()
+        if (debtResponse.ok && debtData?.success) {
+          setDebts(debtData?.data || [])
+          
+        } else {
+          setError("Failed to get debts for this customer")
+        }
+        
+      } catch (err) {
+        console.error(err);
+        setError("Failed to get debts for this customer");
+      } finally {
+        setLoading(false)
+      }
+    };
+    getDebts();
+  }, [selectedCustomerId]);
+
+  const customerName = debt.length > 0 ? debt[0].name : "Customer";
   return (
     <div className="flex flex-col gap-1">
       {/*customer detail and debt balance */}
@@ -12,7 +45,7 @@ function CustomerProfile({onOpenDebtModal}) {
           <div className="flex rounded-full items-center justify-center bg-blue-800 h-12 w-12">
             <span className="text-white text-center font-semibold">AO</span>
           </div>
-          <span className="font-bold text-lg text-black">Akinyi Ochieng</span>
+          <span className="font-bold text-lg text-black">{customerName}</span>
         </div>
         {/*customer balance */}
         <div className="flex flex-col item-center text-right">
@@ -33,7 +66,7 @@ function CustomerProfile({onOpenDebtModal}) {
       </div>
 
       {/*customer debt history */}
-      <StatusTabs onOpenDebtModal={onOpenDebtModal}/>
+      <StatusTabs onOpenDebtModal={onOpenDebtModal} />
     </div>
   );
 }

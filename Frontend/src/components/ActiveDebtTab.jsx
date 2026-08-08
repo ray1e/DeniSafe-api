@@ -1,4 +1,4 @@
-function ActiveDebtTab({ initialDate, totalItems, item }) {
+function ActiveDebtTab({ initialDate, totalItems, item, selectedCustomerId }) {
   return (
     <div className="rounded-md border-slate-200 border shadow-md ml-4 mr-4">
       {/*date and  item count */}

@@ -1,16 +1,19 @@
 import { truncates } from "bcryptjs";
 import { Account, Debt } from "../models/debts.model.js";
+import { updateDebtItem } from "../services/debts.service.js";
 
 export const createDebt = async (req, res, next) => {
   try {
-    const { name, dateTaken, note, items} = req.body;
-    
+    const { name, dateTaken, note, items } = req.body;
+
     //normalize request body to match expected model and validate fields
     const normalizedDebtData = (items || []).map(({ itemName, ...item }) => ({
       ...item,
       name: itemName,
       quantity:
-        item.quantity === undefined || item.quantity === null || item.quantity === ""
+        item.quantity === undefined ||
+        item.quantity === null ||
+        item.quantity === ""
           ? 1
           : Number(item.quantity),
       price:
@@ -21,16 +24,15 @@ export const createDebt = async (req, res, next) => {
 
     const payload = {
       name,
-      debts: {
-        items: normalizedDebtData,
-        dateTaken,
-        note
-      }  
+      debts: [
+        {
+          items: normalizedDebtData,
+          dateTaken,
+          note,
+        },
+      ],
     };
-    /*items: normalizedDebtData,
-      dateTaken,
-      note,
-      ...rest,*/
+
     const debt = await Account.create(payload);
 
     res.status(201).json({ success: true, data: debt });
@@ -96,27 +98,22 @@ export const deleteDebt = async (req, res, next) => {
   }
 };
 
-export const updateItemDetails = async (req, res, next) => {
+export const updateItems = async (req, res, next) => {
   try {
     const { debtId, itemId } = req.params;
     const { name, price, quantity } = req.body;
-    const updates = { name, price, quantity };
 
-    const setObject = {};
+    const itemUpdates = {};
+    if (name !== undefined) itemUpdates.name = name;
+    if (price !== undefined) itemUpdates.price = price;
+    if (quantity !== undefined) itemUpdates.quantity = quantity;
 
-    for (const key in updates) {
-      setObject[`items.$[item].${key}`] = updates[key];
+    const debt = await updateDebtItem(debtId, itemId, itemUpdates);
+    if (!debt) {
+      return res
+        .status(404)
+        .json({ successful: false, message: "Debt not found" });
     }
-
-    const debt = await Debt.findByIdAndUpdate(
-      debtId,
-      { $set: setObject },
-      {
-        arrayFilters: [{ "item._id": itemId }],
-        returnDocument: "after",
-        runValidators: true,
-      },
-    );
 
     res
       .status(200)

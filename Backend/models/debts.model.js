@@ -61,7 +61,7 @@ const accountSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-debtSchema.pre("findOneAndUpdate", function () {
+/*debtSchema.pre("findOneAndUpdate", function () {
   const update = this.getUpdate();
   const items = update.items || update.$set.items;
   if (items || Array.isArray(items)) {
@@ -70,7 +70,7 @@ debtSchema.pre("findOneAndUpdate", function () {
     }, 0);
     this.set({ totalAmount: total });
   }
-});
+});*/
 
 // calculate totalamount before saving
 debtSchema.pre("save", function () {

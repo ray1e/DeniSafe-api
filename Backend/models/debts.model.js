@@ -45,19 +45,16 @@ const debtSchema = new mongoose.Schema({
   },
 });
 
-const customerSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-    trim: true,
-    minLength: 2,
-    maxLength: 50,
-  },
-});
 
 const accountSchema = new mongoose.Schema(
   {
-    name: customerSchema,
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+      minLength: 2,
+      maxLength: 50,
+    },
 
     debts: [debtSchema],
   },
@@ -78,11 +75,11 @@ debtSchema.pre("findOneAndUpdate", function () {
 // calculate totalamount before saving
 debtSchema.pre("save", function () {
   if (this.debts && Array.isArray(this.debts)) {
-    this.debts.forEach(debt => {
+    this.debts.forEach((debt) => {
       if (debt.items && Array.isArray(debt.items)) {
         debt.totalAmount = debt.items.reduce((sum, item) => {
-          return sum + (item.price * item.quantity);
-        }, 0)
+          return sum + item.price * item.quantity;
+        }, 0);
       }
     });
   }
@@ -90,3 +87,4 @@ debtSchema.pre("save", function () {
 
 export const Debt = mongoose.model("Debt", debtSchema);
 export const Items = mongoose.model("Items", itemSchema);
+export const Account = mongoose.model("Account", accountSchema);

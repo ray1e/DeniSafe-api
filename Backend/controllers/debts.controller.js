@@ -1,5 +1,5 @@
 import { truncates } from "bcryptjs";
-import { Debt } from "../models/debts.model.js";
+import { Account, Debt } from "../models/debts.model.js";
 
 export const createDebt = async (req, res, next) => {
   try {
@@ -31,7 +31,7 @@ export const createDebt = async (req, res, next) => {
       dateTaken,
       note,
       ...rest,*/
-    const debt = await Debt.create(payload);
+    const debt = await Account.create(payload);
 
     res.status(201).json({ success: true, data: debt });
   } catch (error) {

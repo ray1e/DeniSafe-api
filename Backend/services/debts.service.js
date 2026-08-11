@@ -106,7 +106,7 @@ export const deleteDebtItem = async (debtId, itemId) => {
   const debtObjectId = new mongoose.Types.ObjectId(debtId);
   const itemObjectId = new mongoose.Types.ObjectId(itemId);
 
-  const updateAccount = await Account.findOneAndUpdate(
+  const updatedAccount = await Account.findOneAndUpdate(
     {
       "debts._id": debtObjectId,
       "debts.items._id": itemObjectId,
@@ -187,6 +187,58 @@ export const deleteDebtItem = async (debtId, itemId) => {
   );
 
   return (
-    updateAccount?.debts?.find((debt) => debt._id.equals(debtObjectId)) ?? null
+    updatedAccount?.debts?.find((debt) => debt._id.equals(debtObjectId)) ?? null
+  );
+};
+
+export const addItems = async (debtId, newItems) => {
+  const debtObjectId = new mongoose.Types.ObjectId(debtId);
+
+  const updatedDebt = await Account.findOneAndUpdate(
+    { "debts._id": debtObjectId },
+    [
+      {
+        $set: {
+          debts: {
+            $map: {
+              input: "$debts",
+              as: "debt",
+              in: {
+                $cond: {
+                  if: { $eq: ["$$debt._id", debtObjectId] },
+                  then: {
+                    $mergeObjects: [
+                      "$$debt",
+                      {
+                        items: { $concatArrays: ["$$debt.items", newItems] },
+                        totalAmount: {
+                          $add: [
+                            {$ifNull: ["$$debt.totalAmount", 0]},
+                            {
+                              $sum: {
+                                $map: {
+                                  input: newItems,
+                                  as: "newItem",
+                                  in: {$multiply:["$$newItem.quantity", "$$newItem.price"]}
+                                }
+                              }
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                  else: "$$debt",
+                },
+              },
+            },
+          },
+        },
+      },
+    ],
+    { returnDocument: "after", runValidators: true, updatePipeline: true },
+  );
+  return (
+    updatedDebt?.debts?.find((debt) => debt._id.equals(debtObjectId)) ??  null
   );
 };

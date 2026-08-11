@@ -1,6 +1,7 @@
 import { truncates } from "bcryptjs";
 import { Account, Debt } from "../models/debts.model.js";
-import { deleteDebtItem, updateDebtItem } from "../services/debts.service.js";
+import { deleteDebtItem, updateDebtItem, addItems } from "../services/debts.service.js";
+import { Types } from "mongoose";
 
 export const createDebt = async (req, res, next) => {
   try {
@@ -130,12 +131,43 @@ export const deleteItems = async (req, res, next) => {
     if (!debt) {
       return res
         .status(404)
-        .json({successful: false, message: "Debt not found"});
+        .json({ successful: false, message: "Debt not found" });
     }
     res
       .status(200)
       .json({ successful: true, message: "item deleted", data: debt });
   } catch (error) {
     next(error);
+  }
+};
+
+export const createItems = async (req, res, next) => {
+  try {
+    const { debtId } = req.params;
+    const { items } = req.body;
+
+    const newItems = items.map((item) => ({
+      name: item.itemName,
+      price: Number(item.price),
+      quantity: Number(item.quantity),
+      _id: new Types.ObjectId(),
+    }));
+    
+    const debt = await addItems(debtId, newItems);
+
+    if (!debt) {/*  */
+      return (
+        res
+          .status(404)
+          .json({ successful: false, message: "Debt not found" })
+      );
+    }
+
+    res
+      .status(200)
+      .json({ successful: true, message: "items added", data: debt });      
+
+  } catch (err) {
+    next(err);
   }
 };

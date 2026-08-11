@@ -1,11 +1,14 @@
 import {Router} from "express";
-import { createDebt, getAllDebts, getCustomerDebts, updateDebtDetails, updateItems, deleteDebt, deleteItems } from "../controllers/debts.controller.js";
+import { createDebt, getAllDebts, getCustomerDebts, updateDebtDetails, updateItems, deleteDebt, deleteItems, createItems } from "../controllers/debts.controller.js";
 import { Debt } from "../models/debts.model.js";
 
 const DebtRouter = Router();
 
 //CREATE new debt
 DebtRouter.post("/", createDebt);
+
+//Add an item to already existing debt
+DebtRouter.post("/:debtId/items", createItems);
 
 //READ all existing debts
 DebtRouter.get("/", getAllDebts);

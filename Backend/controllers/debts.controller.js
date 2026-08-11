@@ -1,6 +1,6 @@
 import { truncates } from "bcryptjs";
 import { Account, Debt } from "../models/debts.model.js";
-import { updateDebtItem } from "../services/debts.service.js";
+import { deleteDebtItem, updateDebtItem } from "../services/debts.service.js";
 
 export const createDebt = async (req, res, next) => {
   try {
@@ -126,15 +126,12 @@ export const updateItems = async (req, res, next) => {
 export const deleteItems = async (req, res, next) => {
   try {
     const { debtId, itemId } = req.params;
-    const debt = await Debt.findByIdAndUpdate(
-      { _id: debtId },
-      {
-        $pull: { items: { _id: itemId } },
-      },
-      {
-        returnDocument: "after",
-      },
-    );
+    const debt = await deleteDebtItem(debtId, itemId);
+    if (!debt) {
+      return res
+        .status(404)
+        .json({successful: false, message: "Debt not found"});
+    }
     res
       .status(200)
       .json({ successful: true, message: "item deleted", data: debt });

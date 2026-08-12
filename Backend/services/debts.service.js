@@ -63,7 +63,7 @@ export const updateDebtItem = async (debtId, itemId, itemUpdates) => {
                     $mergeObjects: [
                       "$$debt",
                       {
-                        totalAmount: {
+                        debtTotal: {
                           $reduce: {
                             input: "$$debt.items",
                             initialValue: 0,
@@ -156,7 +156,7 @@ export const deleteDebtItem = async (debtId, itemId) => {
                     $mergeObjects: [
                       "$$debt",
                       {
-                        totalAmount: {
+                        debtTotal: {
                           $reduce: {
                             input: "$$debt.items",
                             initialValue: 0,
@@ -212,9 +212,9 @@ export const addItems = async (debtId, newItems) => {
                       "$$debt",
                       {
                         items: { $concatArrays: ["$$debt.items", newItems] },
-                        totalAmount: {
+                        debtTotal: {
                           $add: [
-                            { $ifNull: ["$$debt.totalAmount", 0] },
+                            { $ifNull: ["$$debt.debtTotal", 0] },
                             {
                               $sum: {
                                 $map: {
@@ -280,12 +280,14 @@ export const addDebt = async (accountId, debts) => {
                     dateTaken: "$$newDebt.dateTaken",
                     items: "$$newDebt.items",
                     note: "$$newDebt.note",
-                    totalAmount: {
+                    debtTotal: {
                       $sum: {
                         $map: {
                           input: "$$newDebt.items",
                           as: "item",
-                          in: { $multiply: ["$$item.quantity", "$$item.price"] },
+                          in: {
+                            $multiply: ["$$item.quantity", "$$item.price"],
+                          },
                         },
                       },
                     },
@@ -299,7 +301,43 @@ export const addDebt = async (accountId, debts) => {
     ],
     { returnDocument: "after", runValidators: true, updatePipeline: true },
   );
-  return (
-    updatedAccount ?? null
+  return updatedAccount ?? null;
+};
+
+export const deleteDebtsService = async (accountId, targetDebtIds) => {
+  const accountObjectId = new mongoose.Types.ObjectId(accountId);
+
+  const updatedAccount = await DebtAccount.findOneAndUpdate(
+    { _id: accountObjectId, "debts._id": { $in: targetDebtIds } },
+    [
+      {
+        $set: {
+          debts: {
+            $filter: {
+              input: "$debts",
+              as: "debt",
+              cond: {
+                $not: { $in: ["$$debt._id", targetDebtIds] },
+              },
+            },
+          },
+        },
+      },
+      {
+        $set: {
+          grandTotal: {
+            $sum: {
+              $map: {
+                input: "$debts",
+                as: "debt",
+                in: { $ifNull: ["$$debt.debtTotal", 0] },
+              },
+            },
+          },
+        },
+      },
+    ],
+    { returnDocument: "after", runValidators: true, updatePipeline: true },
   );
+  return updatedAccount ?? null;
 };

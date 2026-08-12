@@ -1,6 +1,12 @@
 import { truncates } from "bcryptjs";
 import { DebtAccount, Debt } from "../models/debts.model.js";
-import { deleteDebtItem, updateDebtItem, addItems, addDebt } from "../services/debts.service.js";
+import {
+  deleteDebtItem,
+  deleteDebtsService,
+  updateDebtItem,
+  addItems,
+  addDebt,
+} from "../services/debts.service.js";
 import { Types } from "mongoose";
 
 export const createDebtAccount = async (req, res, next) => {
@@ -43,23 +49,27 @@ export const createDebtAccount = async (req, res, next) => {
 };
 export const createDebt = async (req, res, next) => {
   try {
-    const {accountId} = req.params;
-    const {debts} = req.body;
+    const { accountId } = req.params;
+    const { debts } = req.body;
 
     const account = await addDebt(accountId, debts);
     if (!account) {
-      return (res
+      return res
         .status(404)
-        .json({ success: false, message: "Account not found" }));
+        .json({ success: false, message: "Account not found" });
     }
 
     res
       .status(201)
-      .json({ success: true, message: "Debt added successfully", data: account });
+      .json({
+        success: true,
+        message: "Debt added successfully",
+        data: account,
+      });
   } catch (error) {
-    next(error)
+    next(error);
   }
-}
+};
 
 export const getAllDebts = async (req, res, next) => {
   try {
@@ -106,13 +116,23 @@ export const updateDebtDetails = async (req, res, next) => {
 
 export const deleteDebt = async (req, res, next) => {
   try {
-    await Debt.findByIdAndUpdate(req.params.debtId, {
-      $set: { debtActive: false },
-    });
+    const { accountId } = req.params;
+    const { debtIds } = req.body;
 
+    const targetDebtIds = (Array.isArray(debtIds) ? debtIds : [debtIds]).map(
+      (debtId) => new Types.ObjectId(debtId),
+    );
+
+    const updatedAccount = await deleteDebtsService(accountId, targetDebtIds);
+    if (!updatedAccount) {
+      const originalAccount = await DebtAccount.findById(accountId);
+      return res
+        .status(404)
+        .json({ success: false, message: "customer or debt not found", data: originalAccount });
+    }
     res
       .status(200)
-      .json({ success: true, message: "successfuly deleted debt" });
+      .json({ success: true, message: "successfuly deleted debt", data: updatedAccount });
   } catch (error) {
     next(error);
   }
@@ -171,21 +191,19 @@ export const createItems = async (req, res, next) => {
       quantity: Number(item.quantity),
       _id: new Types.ObjectId(),
     }));
-    
+
     const debt = await addItems(debtId, newItems);
 
-    if (!debt) {/*  */
-      return (
-        res
-          .status(404)
-          .json({ successful: false, message: "Debt not found" })
-      );
+    if (!debt) {
+      /*  */
+      return res
+        .status(404)
+        .json({ successful: false, message: "Debt not found" });
     }
 
     res
       .status(200)
-      .json({ successful: true, message: "items added", data: debt });      
-
+      .json({ successful: true, message: "items added", data: debt });
   } catch (error) {
     next(error);
   }

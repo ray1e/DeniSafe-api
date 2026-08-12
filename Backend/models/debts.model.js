@@ -46,7 +46,7 @@ const debtSchema = new mongoose.Schema({
 });
 
 
-const accountSchema = new mongoose.Schema(
+const debtAccountSchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -87,4 +87,4 @@ debtSchema.pre("save", function () {
 
 export const Debt = mongoose.model("Debt", debtSchema);
 export const Items = mongoose.model("Items", itemSchema);
-export const Account = mongoose.model("Account", accountSchema);
+export const DebtAccount = mongoose.model("debtAccount", debtAccountSchema);

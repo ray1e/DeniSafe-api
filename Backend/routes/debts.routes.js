@@ -1,11 +1,15 @@
 import {Router} from "express";
-import { createDebt, getAllDebts, getCustomerDebts, updateDebtDetails, updateItems, deleteDebt, deleteItems, createItems } from "../controllers/debts.controller.js";
+import { createDebtAccount, createDebt, getAllDebts, getCustomerDebts, updateDebtDetails, updateItems, deleteDebt, deleteItems, createItems } from "../controllers/debts.controller.js";
 import { Debt } from "../models/debts.model.js";
 
-const DebtRouter = Router();
+export const DebtRouter = Router();
+export const CustomerRouter = Router();
 
-//CREATE new debt
-DebtRouter.post("/", createDebt);
+//CREATE new account for customer
+CustomerRouter.post("/", createDebtAccount);
+
+// Add a debt to customer account
+CustomerRouter.post("/:accountId", createDebt)
 
 //Add an item to already existing debt
 DebtRouter.post("/:debtId/items", createItems);
@@ -27,7 +31,3 @@ DebtRouter.delete("/:debtId/items/:itemId", deleteItems)
 
 //DELETE a customers debt
 DebtRouter.delete("/:debtId", deleteDebt);
-
-
-
-export default DebtRouter;

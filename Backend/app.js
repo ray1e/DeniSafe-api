@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import DebtRouter from "./routes/debts.routes.js";
+import {DebtRouter, CustomerRouter} from "./routes/debts.routes.js";
 import connectToDatabase from "./database/mongodb.js";
 import errorMiddleware from "./middlewares/error.middleware.js";
 
@@ -8,6 +8,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use("/api/v1/debts", DebtRouter);
+app.use("/api/v1/customers", CustomerRouter)
 
 app.use(errorMiddleware);
 

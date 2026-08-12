@@ -1,9 +1,9 @@
 import { truncates } from "bcryptjs";
-import { Account, Debt } from "../models/debts.model.js";
-import { deleteDebtItem, updateDebtItem, addItems } from "../services/debts.service.js";
+import { DebtAccount, Debt } from "../models/debts.model.js";
+import { deleteDebtItem, updateDebtItem, addItems, addDebt } from "../services/debts.service.js";
 import { Types } from "mongoose";
 
-export const createDebt = async (req, res, next) => {
+export const createDebtAccount = async (req, res, next) => {
   try {
     const { name, dateTaken, note, items } = req.body;
 
@@ -34,13 +34,32 @@ export const createDebt = async (req, res, next) => {
       ],
     };
 
-    const debt = await Account.create(payload);
+    const debt = await DebtAccount.create(payload);
 
     res.status(201).json({ success: true, data: debt });
   } catch (error) {
     next(error);
   }
 };
+export const createDebt = async (req, res, next) => {
+  try {
+    const {accountId} = req.params;
+    const {debts} = req.body;
+
+    const account = await addDebt(accountId, debts);
+    if (!account) {
+      return (res
+        .status(404)
+        .json({ success: false, message: "Account not found" }));
+    }
+
+    res
+      .status(201)
+      .json({ success: true, message: "Debt added successfully", data: account });
+  } catch (error) {
+    next(error)
+  }
+}
 
 export const getAllDebts = async (req, res, next) => {
   try {
@@ -167,7 +186,7 @@ export const createItems = async (req, res, next) => {
       .status(200)
       .json({ successful: true, message: "items added", data: debt });      
 
-  } catch (err) {
-    next(err);
+  } catch (error) {
+    next(error);
   }
 };

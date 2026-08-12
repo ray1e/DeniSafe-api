@@ -1,11 +1,12 @@
 import mongoose from "mongoose";
-import { Account } from "../models/debts.model.js";
+import { DebtAccount } from "../models/debts.model.js";
+import { Types } from "mongoose";
 
 export const updateDebtItem = async (debtId, itemId, itemUpdates) => {
   const debtObjectId = new mongoose.Types.ObjectId(debtId);
   const itemObjectId = new mongoose.Types.ObjectId(itemId);
 
-  const updatedAccount = await Account.findOneAndUpdate(
+  const updatedAccount = await DebtAccount.findOneAndUpdate(
     {
       "debts._id": debtObjectId,
       "debts.items._id": itemObjectId,
@@ -106,7 +107,7 @@ export const deleteDebtItem = async (debtId, itemId) => {
   const debtObjectId = new mongoose.Types.ObjectId(debtId);
   const itemObjectId = new mongoose.Types.ObjectId(itemId);
 
-  const updatedAccount = await Account.findOneAndUpdate(
+  const updatedAccount = await DebtAccount.findOneAndUpdate(
     {
       "debts._id": debtObjectId,
       "debts.items._id": itemObjectId,
@@ -194,7 +195,7 @@ export const deleteDebtItem = async (debtId, itemId) => {
 export const addItems = async (debtId, newItems) => {
   const debtObjectId = new mongoose.Types.ObjectId(debtId);
 
-  const updatedDebt = await Account.findOneAndUpdate(
+  const updatedDebt = await DebtAccount.findOneAndUpdate(
     { "debts._id": debtObjectId },
     [
       {
@@ -213,15 +214,20 @@ export const addItems = async (debtId, newItems) => {
                         items: { $concatArrays: ["$$debt.items", newItems] },
                         totalAmount: {
                           $add: [
-                            {$ifNull: ["$$debt.totalAmount", 0]},
+                            { $ifNull: ["$$debt.totalAmount", 0] },
                             {
                               $sum: {
                                 $map: {
                                   input: newItems,
                                   as: "newItem",
-                                  in: {$multiply:["$$newItem.quantity", "$$newItem.price"]}
-                                }
-                              }
+                                  in: {
+                                    $multiply: [
+                                      "$$newItem.quantity",
+                                      "$$newItem.price",
+                                    ],
+                                  },
+                                },
+                              },
                             },
                           ],
                         },
@@ -239,6 +245,61 @@ export const addItems = async (debtId, newItems) => {
     { returnDocument: "after", runValidators: true, updatePipeline: true },
   );
   return (
-    updatedDebt?.debts?.find((debt) => debt._id.equals(debtObjectId)) ??  null
+    updatedDebt?.debts?.find((debt) => debt._id.equals(debtObjectId)) ?? null
+  );
+};
+
+export const addDebt = async (accountId, debts) => {
+  const accountObjectId = new mongoose.Types.ObjectId(accountId);
+  const formattedDebts = debts.map((debt) => ({
+    dateTaken: debt.dateTaken ? new Date(debt.dateTaken) : new Date(),
+    items: debt.items.map((item) => ({
+      name: item.itemName,
+      price: Number(item.price),
+      quantity: Number(item.quantity),
+      _id: new Types.ObjectId(),
+    })),
+    note: debt.note || "",
+    _id: new Types.ObjectId(),
+  }));
+
+  const updatedAccount = await DebtAccount.findOneAndUpdate(
+    { _id: accountObjectId },
+    [
+      {
+        $set: {
+          debts: {
+            $concatArrays: [
+              { $ifNull: ["$debts", []] },
+              {
+                $map: {
+                  input: formattedDebts,
+                  as: "newDebt",
+                  in: {
+                    _id: "$$newDebt._id",
+                    dateTaken: "$$newDebt.dateTaken",
+                    items: "$$newDebt.items",
+                    note: "$$newDebt.note",
+                    totalAmount: {
+                      $sum: {
+                        $map: {
+                          input: "$$newDebt.items",
+                          as: "item",
+                          in: { $multiply: ["$$item.quantity", "$$item.price"] },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            ],
+          },
+        },
+      },
+    ],
+    { returnDocument: "after", runValidators: true, updatePipeline: true },
+  );
+  return (
+    updatedAccount ?? null
   );
 };

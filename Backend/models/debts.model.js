@@ -29,7 +29,7 @@ const debtSchema = new mongoose.Schema({
 
   items: [itemSchema],
 
-  totalAmount: {
+  debtTotal: {
     type: Number,
     default: 0,
   },
@@ -57,6 +57,11 @@ const debtAccountSchema = new mongoose.Schema(
     },
 
     debts: [debtSchema],
+
+    grandTotal: {
+      type: Number,
+      default: 0,
+    }
   },
   { timestamps: true },
 );
@@ -68,7 +73,7 @@ const debtAccountSchema = new mongoose.Schema(
     const total = items.reduce((sum, item) => {
       return sum + item.price * item.quantity;
     }, 0);
-    this.set({ totalAmount: total });
+    this.set({ debtTotal: total });
   }
 });*/
 
@@ -77,7 +82,7 @@ debtSchema.pre("save", function () {
   if (this.debts && Array.isArray(this.debts)) {
     this.debts.forEach((debt) => {
       if (debt.items && Array.isArray(debt.items)) {
-        debt.totalAmount = debt.items.reduce((sum, item) => {
+        debt.debtTotal = debt.items.reduce((sum, item) => {
           return sum + item.price * item.quantity;
         }, 0);
       }

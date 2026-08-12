@@ -30,4 +30,4 @@ DebtRouter.patch("/:debtId/items/:itemId", updateItems)
 DebtRouter.delete("/:debtId/items/:itemId", deleteItems)
 
 //DELETE a customers debt
-DebtRouter.delete("/:debtId", deleteDebt);
+CustomerRouter.patch("/:accountId", deleteDebt);

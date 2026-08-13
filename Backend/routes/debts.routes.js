@@ -1,5 +1,5 @@
 import {Router} from "express";
-import { createDebtAccount, createDebt, getAllDebts, getCustomerDebts, updateDebtDetails, updateItems, deleteDebt, deleteItems, createItems } from "../controllers/debts.controller.js";
+import { createDebtAccount, createDebt, getAllDebts, getCustomerDebts, updateItems, deleteDebt, deleteItems, createItems } from "../controllers/debts.controller.js";
 import { Debt } from "../models/debts.model.js";
 
 export const DebtRouter = Router();
@@ -18,10 +18,7 @@ DebtRouter.post("/:debtId/items", createItems);
 DebtRouter.get("/", getAllDebts);
 
 //READ single customers debt
-DebtRouter.get("/:debtId", getCustomerDebts);
-
-//UPDATE a customers debt details
-DebtRouter.patch("/:debtId", updateDebtDetails);
+CustomerRouter.get("/:accountId", getCustomerDebts);
 
 //edit details of an item
 DebtRouter.patch("/:debtId/items/:itemId", updateItems)

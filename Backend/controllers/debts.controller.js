@@ -73,7 +73,7 @@ export const createDebt = async (req, res, next) => {
 
 export const getAllDebts = async (req, res, next) => {
   try {
-    const debts = await Debt.find();
+    const debts = await DebtAccount.find();
     res.status(200).json({ success: true, data: debts });
   } catch (error) {
     next(error);
@@ -82,33 +82,8 @@ export const getAllDebts = async (req, res, next) => {
 
 export const getCustomerDebts = async (req, res, next) => {
   try {
-    const customerDebts = await Debt.find({ _id: req.params.debtId });
+    const customerDebts = await DebtAccount.find({ _id: req.params.accountId });
     res.status(200).json({ success: true, data: customerDebts });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const updateDebtDetails = async (req, res, next) => {
-  try {
-    const { action, ...updateData } = req.body;
-
-    let debt;
-    if (action == addItem) {
-      debt = await Debt.findByIdAndUpdate(
-        req.params.debtId,
-        { $push: { items: updateData } },
-        { runValidators: true, new: true },
-      );
-    } else {
-      debt = await Debt.findByIdAndUpdate(
-        req.params.debtId,
-        { $set: updateData },
-        { returnDocument: "after" },
-      );
-    }
-
-    res.status(200).json({ success: true, data: debt });
   } catch (error) {
     next(error);
   }

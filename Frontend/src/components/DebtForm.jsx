@@ -1,5 +1,4 @@
-import { useContext } from "react";
-import { useDebt } from "./DebtContext";
+import { useDebt } from "../context/DebtContext";
 
 function DebtForm() {
   const { debtData, setDebtData, today, dateTaken, setDateTaken } = useDebt();

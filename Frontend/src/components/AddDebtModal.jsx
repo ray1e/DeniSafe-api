@@ -1,10 +1,8 @@
-import { useDebt } from "./DebtContext";
 import DebtForm from "./DebtForm";
 import { useState } from "react";
 
 function AddDebtModal({ isOpen, onClose }) {
   const [note, setNote] = useState("");
-  const { today } = useDebt();
 
   if (!isOpen) return null;
 

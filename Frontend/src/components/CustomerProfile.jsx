@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import CustomerStat from "./CustomerStat";
 import StatusTabs from "./StatusTabs";
-import { fetchDebts } from "../services/api";
+import { useCustomers } from "@/context/CustomerContext";
 
-function CustomerProfile({ onOpenDebtModal, selectedCustomerId }) {
+function CustomerProfile({ onOpenDebtModal }) {
   const [loading, setLoading] = useState(true);
   const [debt, setDebts] = useState([]);
   const [error, setError] = useState(null);
+  const {setSelectedCustomerData} = useCustomers();
+  const {selectedCustomerId} = useCustomers();
+
   useEffect(() => {
     if (!selectedCustomerId) return;
 
@@ -15,10 +18,11 @@ function CustomerProfile({ onOpenDebtModal, selectedCustomerId }) {
       setError(null);
       //fetch customer debts
       try {
-        const debtResponse = await fetch(`http://localhost:3000/api/v1/debts/${selectedCustomerId}`);
+        const debtResponse = await fetch(`http://localhost:3000/api/v1/customers/${selectedCustomerId}/debts`);
         const debtData = await debtResponse.json()
         if (debtResponse.ok && debtData?.success) {
           setDebts(debtData?.data || [])
+          setSelectedCustomerData(debtData?.data || [])
           
         } else {
           setError("Failed to get debts for this customer")

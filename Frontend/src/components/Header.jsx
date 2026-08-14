@@ -1,9 +1,5 @@
 import QuickActions from "./QuickActions";
 import StatItem from "./StatItem";
-import { useState } from "react";
-import AddCustomerModal from "./AddCustomerModal";
-import AddDebtModal from "./AddDebtModal";
-import { useDebt } from "./DebtContext";
 
 function Header({onOPenAddCustomer}) {
   

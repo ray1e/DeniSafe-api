@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ModalContext } from "./DebtModalContext";
+import { ModalContext } from "../context/DebtModalContext";
 
 
  export function ModalProvider ({children}) {

@@ -1,4 +1,4 @@
-import { DebtContext } from "./DebtContext";
+import { DebtContext } from "../context/DebtContext";
 import { useState } from "react";
 
 export function DebtProvider({ children }) {

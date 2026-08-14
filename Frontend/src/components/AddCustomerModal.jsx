@@ -1,7 +1,7 @@
 import { useState } from "react";
 import DebtForm from "./DebtForm";
-import { useCustomers } from "./CustomerContext";
-import { useDebt } from "./DebtContext";
+import { useCustomers } from "../context/CustomerContext";
+import { useDebt } from "../context/DebtContext";
 
 function AddCustomerModal({ isOpen, onClose }) {
   const { customerData, setCustomerData } = useCustomers();
@@ -26,6 +26,7 @@ function AddCustomerModal({ isOpen, onClose }) {
         quantity: Number(item.quantity) || 1,
       })),
     };
+    
 
     const error =
       customerData.name.trim() === ""
@@ -43,8 +44,8 @@ function AddCustomerModal({ isOpen, onClose }) {
     if (error) return;
 
     try {
-      console.log("Sending items:", debtData);
-      const res = await fetch("http://localhost:3000/api/v1/debts", {
+      console.log("Sending items:", payload);
+      const res = await fetch("http://localhost:3000/api/v1/customers", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

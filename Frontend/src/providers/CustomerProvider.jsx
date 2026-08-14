@@ -1,4 +1,4 @@
-import {CustomerContext} from "./CustomerContext"
+import {CustomerContext} from "../context/CustomerContext"
 import { useState } from "react";
 
 export function CustomerProvider({children}) {
@@ -7,9 +7,15 @@ export function CustomerProvider({children}) {
     note: "",
   });
 
+  const [selectedCustomerData, setSelectedCustomerData] = useState(""); 
+  const [selectedCustomerId, setSelectedCustomerId] = useState("")
   const value={
     customerData,
     setCustomerData,
+    selectedCustomerData,
+    setSelectedCustomerData,
+    selectedCustomerId,
+    setSelectedCustomerId
   }
 
   return (

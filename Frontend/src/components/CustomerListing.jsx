@@ -1,17 +1,19 @@
 import { useEffect, useState } from "react";
-import { fetchDebts } from "../services/api";
+import { fetchAllDebtAccounts } from "../services/api";
+import { useCustomers } from "@/context/CustomerContext";
 
-function CustomerListing({onSelectCustomer}) {
+function CustomerListing() {
   const [debts, setDebts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const {setSelectedCustomerId} = useCustomers();
 
   useEffect(() => {
     let isMounted = true;
 
     const loadDebts = async () => {
       try {
-        const debtResponse = await fetchDebts();
+        const debtResponse = await fetchAllDebtAccounts();
 
         if (isMounted && debtResponse?.success) {
           setDebts(debtResponse.data ?? []);
@@ -67,7 +69,7 @@ function CustomerListing({onSelectCustomer}) {
           debts.map((debt) => {
             const initials = getInitials(debt.name);
             return (
-              <div key={debt._id} onClick={() => onSelectCustomer(debt._id)} className="flex p-3 border-b border-brand-items-separator cursor-default justify-between hover:bg-brand-card">
+              <div key={debt._id} onClick={() => setSelectedCustomerId(debt._id)} className="flex p-3 border-b border-brand-items-separator cursor-default justify-between hover:bg-brand-card">
                 <div className="flex gap-3">
                   {/*Initials avatar*/}
                   <span className="flex w-8 h-8 rounded-full bg-blue-700 justify-center items-center text-xs text-white">
@@ -79,11 +81,11 @@ function CustomerListing({onSelectCustomer}) {
                     <span className="text-sm">{debt.name}</span>
                     {/*debt number */}
                     <span className="text-brand-graytext text-xs">
-                      {debt.items.length}{" "}
-                      {debt.items.length === 1 ? "item" : "items"}
+                      {debt.items?.length}{" "}
+                      {debt.items?.length === 1 ? "item" : "items"}
                     </span>
                   </div>
-                </div>
+                </div>  
 
                 {/*total debt amount */}
                 <span className="text-brand-action text-base font-medium">

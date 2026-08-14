@@ -1,5 +1,5 @@
 import QuickActions from "./QuickActions";
-import { useModal } from "./DebtModalContext";
+import { useModal } from "../context/DebtModalContext";
 
 function StatusTabs() {
   const {openDebtModal} = useModal();

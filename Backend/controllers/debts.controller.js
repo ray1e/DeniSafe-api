@@ -59,13 +59,11 @@ export const createDebt = async (req, res, next) => {
         .json({ success: false, message: "Account not found" });
     }
 
-    res
-      .status(201)
-      .json({
-        success: true,
-        message: "Debt added successfully",
-        data: account,
-      });
+    res.status(201).json({
+      success: true,
+      message: "Debt added successfully",
+      data: account,
+    });
   } catch (error) {
     next(error);
   }
@@ -82,7 +80,12 @@ export const getAllDebts = async (req, res, next) => {
 
 export const getCustomerDebts = async (req, res, next) => {
   try {
-    const customerDebts = await DebtAccount.find({ _id: req.params.accountId });
+    const customerDebts = await DebtAccount.findOne({
+      _id: req.params.accountId,
+    })
+      .select("grandTotal debts")
+      .lean();
+
     res.status(200).json({ success: true, data: customerDebts });
   } catch (error) {
     next(error);
@@ -103,11 +106,19 @@ export const deleteDebt = async (req, res, next) => {
       const originalAccount = await DebtAccount.findById(accountId);
       return res
         .status(404)
-        .json({ success: false, message: "customer or debt not found", data: originalAccount });
+        .json({
+          success: false,
+          message: "customer or debt not found",
+          data: originalAccount,
+        });
     }
     res
       .status(200)
-      .json({ success: true, message: "successfuly deleted debt", data: updatedAccount });
+      .json({
+        success: true,
+        message: "successfuly deleted debt",
+        data: updatedAccount,
+      });
   } catch (error) {
     next(error);
   }

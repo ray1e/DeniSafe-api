@@ -9,6 +9,7 @@ export const CustomerRouter = Router();
 CustomerRouter.post("/", createDebtAccount);
 
 // Add a debt to customer account
+
 CustomerRouter.post("/:accountId", createDebt)
 
 //Add an item to already existing debt
@@ -17,8 +18,8 @@ DebtRouter.post("/:debtId/items", createItems);
 //READ all existing debts
 DebtRouter.get("/", getAllDebts);
 
-//READ single customers debt
-CustomerRouter.get("/:accountId", getCustomerDebts);
+//READ debts belonging to one customer only
+CustomerRouter.get("/:accountId/debts", getCustomerDebts);
 
 //edit details of an item
 DebtRouter.patch("/:debtId/items/:itemId", updateItems)

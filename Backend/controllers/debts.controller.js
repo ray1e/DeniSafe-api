@@ -69,7 +69,7 @@ export const createDebt = async (req, res, next) => {
   }
 };
 
-export const getAllDebts = async (req, res, next) => {
+export const getAllDebtAccounts = async (req, res, next) => {
   try {
     const debts = await DebtAccount.find();
     res.status(200).json({ success: true, data: debts });
@@ -77,6 +77,24 @@ export const getAllDebts = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getDebtAccount = async (req, res, next) => {
+  try {
+    const {accountId} = req.params;
+    const debtAcoount = await DebtAccount.find({_id: accountId}).lean();
+    if (!debtAcoount) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Debt account not found" });
+    }
+
+    res
+      .status(200)
+      .json({ success: true, message: "Debt account fetched", data: debtAcoount });
+  } catch (error) {
+    next(error)
+  }
+}
 
 export const getCustomerDebts = async (req, res, next) => {
   try {

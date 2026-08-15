@@ -45,7 +45,6 @@ const debtSchema = new mongoose.Schema({
   },
 });
 
-
 const debtAccountSchema = new mongoose.Schema(
   {
     name: {
@@ -61,7 +60,7 @@ const debtAccountSchema = new mongoose.Schema(
     grandTotal: {
       type: Number,
       default: 0,
-    }
+    },
   },
   { timestamps: true },
 );
@@ -83,10 +82,7 @@ debtAccountSchema.pre("save", function () {
     this.debts.forEach((debt) => {
       if (debt.items && Array.isArray(debt.items)) {
         debt.debtTotal = debt.items.reduce((sum, item) => {
-          return (
-            sum + item.price * item.quantity
-            
-          );
+          return sum + item.price * item.quantity;
         }, 0);
       }
     });
@@ -95,7 +91,6 @@ debtAccountSchema.pre("save", function () {
       return sum + (Number(debt.debtTotal) || 0);
     }, 0);
   }
-  
 });
 
 export const Debt = mongoose.model("Debt", debtSchema);

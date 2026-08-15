@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import CustomerStat from "./CustomerStat";
 import StatusTabs from "./StatusTabs";
 import { useCustomers } from "@/context/CustomerContext";
+import {useDebt} from "@/context/DebtContext"
 
 function CustomerProfile({ onOpenDebtModal }) {
   const [loading, setLoading] = useState(true);
@@ -9,6 +10,7 @@ function CustomerProfile({ onOpenDebtModal }) {
   const [error, setError] = useState(null);
   const {setSelectedCustomerData} = useCustomers();
   const {selectedCustomerId} = useCustomers();
+  const {currentDebtCount} = useDebt();
 
   useEffect(() => {
     if (!selectedCustomerId) return;
@@ -18,7 +20,7 @@ function CustomerProfile({ onOpenDebtModal }) {
       setError(null);
       //fetch customer debts
       try {
-        const debtResponse = await fetch(`http://localhost:3000/api/v1/customers/${selectedCustomerId}/debts`);
+        const debtResponse = await fetch(`http://localhost:3000/api/v1/customers/${selectedCustomerId}`);
         const debtData = await debtResponse.json()
         if (debtResponse.ok && debtData?.success) {
           setDebts(debtData?.data || [])
@@ -62,7 +64,7 @@ function CustomerProfile({ onOpenDebtModal }) {
 
       {/*customer stats */}
       <div className="flex flex-row gap-4 border-b border-brand-items-separator pb-2 p-4">
-        <CustomerStat value="1" label="active debt" />
+        <CustomerStat value={currentDebtCount ?? 0} label={currentDebtCount > 1 ? "active debts" : "active debt"} />
         <div className="h-4 w-px bg-slate-200" aria-hidden="true" />
         <CustomerStat value="1" label="paid" />
         <div className="h-4 w-px bg-slate-200" aria-hidden="true" />

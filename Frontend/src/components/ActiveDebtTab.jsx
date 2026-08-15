@@ -1,4 +1,5 @@
 import { useCustomers } from "@/context/CustomerContext";
+import {useDebt} from "@/context/DebtContext"
 import { fetchCustomerDebts } from "@/services/api";
 import { useEffect, useState } from "react";
 
@@ -7,6 +8,7 @@ function ActiveDebtTab() {
 
   const [loading, setLoading] = useState(false);
   const [debtsData, setDebtsData] = useState(null);
+  const {currentDebtCount, setCurrentDebtCount} = useDebt();
 
   // runs every time the customer selected changes
   useEffect(() => {
@@ -58,6 +60,8 @@ function ActiveDebtTab() {
   }
 
   const { grandTotal, debts = [] } = debtsData || {};
+  setCurrentDebtCount(debts?.length ?? 0);
+  
 
   return (
     <>
@@ -66,7 +70,7 @@ function ActiveDebtTab() {
           No customer records available.
         </p>
       ) : (
-        debts.map((debt) => {
+        debts.map((debt, index) => {
           return (
             <div
               className="rounded-md border-slate-200 border shadow-md ml-4 mr-4"
@@ -74,7 +78,7 @@ function ActiveDebtTab() {
             >
               {/*date and  item count */}
               <div className="flex flex-row p-2 gap-6 items-center  border-b border-brand-items-separator">
-                <span className="text-gray-500 text-sm">#001</span>
+                <span className="text-gray-500 text-sm">{`# ${String(index + 1).padStart(3, "0")}`}</span>
                 <span className="text-gray-500 text-sm">8 jan 2026</span>
                 <span className="border-red-200 border font-medium bg-red-100 text-brand-action rounded-xs text-xs px-2">
                   3 items

@@ -9,6 +9,7 @@ export function CustomerProvider({children}) {
 
   const [selectedCustomerData, setSelectedCustomerData] = useState(""); 
   const [selectedCustomerId, setSelectedCustomerId] = useState("")
+
   const value={
     customerData,
     setCustomerData,

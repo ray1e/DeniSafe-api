@@ -1,5 +1,5 @@
 import { useCustomers } from "@/context/CustomerContext";
-import {useDebt} from "@/context/DebtContext"
+import { useDebt } from "@/context/DebtContext";
 import { fetchCustomerDebts } from "@/services/api";
 import { useEffect, useState } from "react";
 
@@ -8,7 +8,7 @@ function ActiveDebtTab() {
 
   const [loading, setLoading] = useState(false);
   const [debtsData, setDebtsData] = useState(null);
-  const {currentDebtCount, setCurrentDebtCount} = useDebt();
+  const { setCurrentDebtCount } = useDebt();
 
   // runs every time the customer selected changes
   useEffect(() => {
@@ -24,7 +24,23 @@ function ActiveDebtTab() {
       try {
         const response = await fetchCustomerDebts(selectedCustomerId);
         if (isMounted && response?.success) {
-          setDebtsData(response.data);
+          const {grandTotal, debts = []} = response.data;
+          const normalizedDebts = debts.map((debt) => ({
+            ...debt,
+            formattedDate: new Date(debt.dateTaken).toLocaleDateString(
+              "en-GB",
+              {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+                timeZone: "UTC",
+              },
+            ),
+          }));
+          setDebtsData({
+            grandTotal,
+            debts: normalizedDebts,
+          });
         } else if (isMounted) {
           console.error("Failed to fetch customer debts");
         }
@@ -40,6 +56,12 @@ function ActiveDebtTab() {
       isMounted = false;
     };
   }, [selectedCustomerId]);
+
+  const { grandTotal, debts = [] } = debtsData || {};
+
+  useEffect(() => {
+    setCurrentDebtCount(debts?.length ?? 0);
+  }, [debts, setCurrentDebtCount]);
 
   if (!selectedCustomerId) {
     return (
@@ -59,10 +81,6 @@ function ActiveDebtTab() {
     );
   }
 
-  const { grandTotal, debts = [] } = debtsData || {};
-  setCurrentDebtCount(debts?.length ?? 0);
-  
-
   return (
     <>
       {!Array.isArray(debts) || debts.length === 0 ? (
@@ -79,7 +97,9 @@ function ActiveDebtTab() {
               {/*date and  item count */}
               <div className="flex flex-row p-2 gap-6 items-center  border-b border-brand-items-separator">
                 <span className="text-gray-500 text-sm">{`# ${String(index + 1).padStart(3, "0")}`}</span>
-                <span className="text-gray-500 text-sm">8 jan 2026</span>
+                <span className="text-gray-500 text-sm">
+                  {debt.formattedDate}
+                </span>
                 <span className="border-red-200 border font-medium bg-red-100 text-brand-action rounded-xs text-xs px-2">
                   3 items
                 </span>
@@ -112,10 +132,10 @@ function ActiveDebtTab() {
               {/*grand total row */}
               <div className="flex justify-between  items-center pt-4 border-t m-2  border-slate-400 font-medium text-base">
                 <span className="text-brand-graytext text-left w-4/5">
-                  GRAND TOTAL
+                  TOTAL
                 </span>
                 <span className="text-brand-action text-right w-1/5">
-                  {grandTotal}
+                  {debt.debtTotal}
                 </span>
                 <span className="w-14 shrink-0"></span>
               </div>

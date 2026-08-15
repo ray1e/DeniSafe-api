@@ -78,16 +78,24 @@ const debtAccountSchema = new mongoose.Schema(
 });*/
 
 // calculate totalamount before saving
-debtSchema.pre("save", function () {
+debtAccountSchema.pre("save", function () {
   if (this.debts && Array.isArray(this.debts)) {
     this.debts.forEach((debt) => {
       if (debt.items && Array.isArray(debt.items)) {
         debt.debtTotal = debt.items.reduce((sum, item) => {
-          return sum + item.price * item.quantity;
+          return (
+            sum + item.price * item.quantity
+            
+          );
         }, 0);
       }
     });
+
+    this.grandTotal = this.debts.reduce((sum, debt) => {
+      return sum + (Number(debt.debtTotal) || 0);
+    }, 0);
   }
+  
 });
 
 export const Debt = mongoose.model("Debt", debtSchema);

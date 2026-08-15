@@ -1,22 +1,18 @@
-import ActiveDebtTab from "../components/ActiveDebtTab";
-import { CustomerProvider } from "../components/CustomerProvider";
-import CustomerListing from "../components/CustomerListing";
-import CustomerProfile from "../components/CustomerProfile";
-import { DebtProvider } from "../components/DebtProvider";
+import { CustomerProvider } from "../providers/CustomerProvider";
+import { DebtProvider } from "../providers/DebtProvider";
 import FullCustomerDashboard from "../components/FullCustomerDashboard";
-import Header from "../components/Header";
-import { ModalProvider } from "../components/ModalProvider";
+import { ModalProvider } from  "../providers/ModalProvider"
 
 function Home() {
   return (
     <div>
       <main>
         <CustomerProvider>
-            <DebtProvider>
-              <ModalProvider>
-                <FullCustomerDashboard />
-              </ModalProvider>
-            </DebtProvider>
+          <DebtProvider>
+            <ModalProvider>
+              <FullCustomerDashboard />
+            </ModalProvider>
+          </DebtProvider>
         </CustomerProvider>
       </main>
     </div>

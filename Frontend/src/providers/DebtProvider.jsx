@@ -1,4 +1,4 @@
-import { DebtContext } from "./DebtContext";
+import { DebtContext } from "../context/DebtContext";
 import { useState } from "react";
 
 export function DebtProvider({ children }) {
@@ -11,13 +11,16 @@ export function DebtProvider({ children }) {
       quantity: "",
     },
   ]);
+  const [currentDebtCount, setCurrentDebtCount] = useState(null);
 
   const value = {
     debtData,
     setDebtData,
     today,
     dateTaken,
-    setDateTaken
+    setDateTaken,
+    currentDebtCount,
+    setCurrentDebtCount,
   };
 
   return <DebtContext.Provider value={value}>{children}</DebtContext.Provider>;

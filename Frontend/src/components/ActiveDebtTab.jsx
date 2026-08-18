@@ -9,6 +9,7 @@ function ActiveDebtTab() {
   const [loading, setLoading] = useState(false);
   const [debtsData, setDebtsData] = useState(null);
   const { setCurrentDebtCount } = useDebt();
+  const { setEarliestDate, earliestDate } = useCustomers();
 
   // runs every time the customer selected changes
   useEffect(() => {
@@ -24,7 +25,7 @@ function ActiveDebtTab() {
       try {
         const response = await fetchCustomerDebts(selectedCustomerId);
         if (isMounted && response?.success) {
-          const {grandTotal, debts = []} = response.data;
+          const { grandTotal, debts = [] } = response.data;
           const normalizedDebts = debts.map((debt) => ({
             ...debt,
             formattedDate: new Date(debt.dateTaken).toLocaleDateString(
@@ -62,6 +63,33 @@ function ActiveDebtTab() {
   useEffect(() => {
     setCurrentDebtCount(debts?.length ?? 0);
   }, [debts, setCurrentDebtCount]);
+
+  useEffect(() => {
+    if (!debts || debts.length === 0) {
+      setEarliestDate(null);
+      return;
+    }
+
+    const allDates = debts
+      .map((debt) => new Date(debt.dateTaken).getTime())
+      .filter((value) => !Number.isNaN(value))
+      .sort((a, b) => a - b);
+
+    if (allDates.length === 0) {
+      setEarliestDate(null);
+      return;
+    }
+
+    const earliest = new Date(allDates[0]);
+    setEarliestDate(
+      earliest.toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        timeZone: "UTC",
+      }),
+    );
+  }, [debts, setEarliestDate]);
 
   if (!selectedCustomerId) {
     return (
@@ -101,7 +129,7 @@ function ActiveDebtTab() {
                   {debt.formattedDate}
                 </span>
                 <span className="border-red-200 border font-medium bg-red-100 text-brand-action rounded-xs text-xs px-2">
-                  3 items
+                  {`${debt.items.length} ${debt.items.length > 1 ? "items" : "item"}`}
                 </span>
               </div>
 

@@ -9,8 +9,9 @@ function CustomerProfile({ onOpenDebtModal }) {
   const [debtAccount, setDebtAccount] = useState([]);
   const [error, setError] = useState(null);
   const { setSelectedCustomerData } = useCustomers();
-  const { selectedCustomerId } = useCustomers();
+  const { selectedCustomerId, earliestDate } = useCustomers();
   const { currentDebtCount } = useDebt();
+  
 
   useEffect(() => {
     if (!selectedCustomerId) return;
@@ -76,7 +77,7 @@ function CustomerProfile({ onOpenDebtModal }) {
         <div className="h-4 w-px bg-slate-200" aria-hidden="true" />
         <CustomerStat value="1" label="paid" />
         <div className="h-4 w-px bg-slate-200" aria-hidden="true" />
-        <CustomerStat label="since 8 jan 2026" />
+        <CustomerStat label={`since ${earliestDate}`} />
       </div>
 
       {/*customer debt history */}

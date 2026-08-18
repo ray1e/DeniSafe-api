@@ -6,7 +6,8 @@ function CustomerListing() {
   const [debts, setDebts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const {setSelectedCustomerId} = useCustomers();
+  const {setSelectedCustomerId, activeDebtors, setActiveDebtors} = useCustomers();
+
 
   useEffect(() => {
     let isMounted = true;
@@ -17,6 +18,7 @@ function CustomerListing() {
 
         if (isMounted && debtResponse?.success) {
           setDebts(debtResponse.data ?? []);
+          setActiveDebtors(debtResponse.data.length)
         } else if (isMounted) {
           setError("Failed to get debts");
         }

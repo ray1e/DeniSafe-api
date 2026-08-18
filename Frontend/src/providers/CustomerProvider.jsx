@@ -8,7 +8,9 @@ export function CustomerProvider({children}) {
   });
 
   const [selectedCustomerData, setSelectedCustomerData] = useState(""); 
-  const [selectedCustomerId, setSelectedCustomerId] = useState("")
+  const [selectedCustomerId, setSelectedCustomerId] = useState("");
+  const [earliestDate, setEarliestDate] = useState(null);
+  const [activeDebtors, setActiveDebtors] = useState(null);
 
   const value={
     customerData,
@@ -16,7 +18,11 @@ export function CustomerProvider({children}) {
     selectedCustomerData,
     setSelectedCustomerData,
     selectedCustomerId,
-    setSelectedCustomerId
+    setSelectedCustomerId,
+    earliestDate,
+    setEarliestDate,
+    activeDebtors,
+    setActiveDebtors
   }
 
   return (

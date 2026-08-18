@@ -1,8 +1,9 @@
 import QuickActions from "./QuickActions";
 import StatItem from "./StatItem";
+import { useCustomers } from "@/context/CustomerContext";
 
 function Header({onOPenAddCustomer}) {
-  
+  const {activeDebtors} = useCustomers();
   return (
     <div className="flex flex-row items-center justify-between border-b py-4 px-2">
       {/*app branding */}
@@ -20,12 +21,12 @@ function Header({onOPenAddCustomer}) {
         />
         <div className="h-8 w-px bg-slate-200" aria-hidden="true" />
         <StatItem
-          value="2"
+          value={activeDebtors}
           label="ACTIVE DEBTORS"
           className="text-brand-text"
         />
         <div className="h-8 w-px bg-slate-200" aria-hidden="true" />
-        <StatItem value="5" label="CUSTOMERS" className="text-brand-text" />
+        <StatItem value={activeDebtors} label="CUSTOMERS" className="text-brand-text" />
       </div>
       <QuickActions
         label="+ New Customer"

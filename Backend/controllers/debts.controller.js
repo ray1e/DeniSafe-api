@@ -80,21 +80,23 @@ export const getAllDebtAccounts = async (req, res, next) => {
 
 export const getDebtAccount = async (req, res, next) => {
   try {
-    const {accountId} = req.params;
-    const debtAcoount = await DebtAccount.find({_id: accountId}).lean();
+    const { accountId } = req.params;
+    const debtAcoount = await DebtAccount.find({ _id: accountId }).lean();
     if (!debtAcoount) {
       return res
         .status(404)
         .json({ success: false, message: "Debt account not found" });
     }
 
-    res
-      .status(200)
-      .json({ success: true, message: "Debt account fetched", data: debtAcoount });
+    res.status(200).json({
+      success: true,
+      message: "Debt account fetched",
+      data: debtAcoount,
+    });
   } catch (error) {
-    next(error)
+    next(error);
   }
-}
+};
 
 export const getCustomerDebts = async (req, res, next) => {
   try {
@@ -122,21 +124,17 @@ export const deleteDebt = async (req, res, next) => {
     const updatedAccount = await deleteDebtsService(accountId, targetDebtIds);
     if (!updatedAccount) {
       const originalAccount = await DebtAccount.findById(accountId);
-      return res
-        .status(404)
-        .json({
-          success: false,
-          message: "customer or debt not found",
-          data: originalAccount,
-        });
-    }
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "successfuly deleted debt",
-        data: updatedAccount,
+      return res.status(404).json({
+        success: false,
+        message: "customer or debt not found",
+        data: originalAccount,
       });
+    }
+    res.status(200).json({
+      success: true,
+      message: "successfuly deleted debt",
+      data: updatedAccount,
+    });
   } catch (error) {
     next(error);
   }
@@ -208,6 +206,30 @@ export const createItems = async (req, res, next) => {
     res
       .status(200)
       .json({ successful: true, message: "items added", data: debt });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getOverallDebtTotal = async (req, res, next) => {
+  try {
+    const result = await DebtAccount.aggregate([
+      {
+        $group: {
+          _id: null,
+          totalOutstandingDebt: { $sum: "$grandTotal" },
+          customerCount: { $sum: 1 },
+        },
+      },
+    ]);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        totalOutstandingDebt: result[0]?.totalOutstandingDebt || 0,
+        customerCount: result[0]?.customerCount || 0,
+      },
+    });
   } catch (error) {
     next(error);
   }

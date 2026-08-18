@@ -1,9 +1,36 @@
+import { useEffect, useState } from "react";
 import QuickActions from "./QuickActions";
 import StatItem from "./StatItem";
 import { useCustomers } from "@/context/CustomerContext";
+import { fetchDebtsSummary } from "@/services/api";
 
-function Header({onOPenAddCustomer}) {
-  const {activeDebtors} = useCustomers();
+function Header({ onOPenAddCustomer }) {
+  const { activeDebtors } = useCustomers();
+  const [debtsSummary, setDebtsSummary] = useState(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadSummary = async () => {
+      try {
+        const summary = await fetchDebtsSummary();
+
+        if (isMounted && summary?.success) {
+          setDebtsSummary(summary.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch debts summary:", error);
+      }
+    };
+
+    loadSummary();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const { totalOutstandingDebt = 0 } = debtsSummary || {};
   return (
     <div className="flex flex-row items-center justify-between border-b py-4 px-2">
       {/*app branding */}
@@ -15,7 +42,7 @@ function Header({onOPenAddCustomer}) {
       {/*stats group */}
       <div className="flex flex-row gap-4">
         <StatItem
-          value="Ksh 10,200"
+          value={totalOutstandingDebt}
           label="TOTAL OWNED"
           className="text-brand-action"
         />
@@ -26,7 +53,11 @@ function Header({onOPenAddCustomer}) {
           className="text-brand-text"
         />
         <div className="h-8 w-px bg-slate-200" aria-hidden="true" />
-        <StatItem value={activeDebtors} label="CUSTOMERS" className="text-brand-text" />
+        <StatItem
+          value={activeDebtors}
+          label="CUSTOMERS"
+          className="text-brand-text"
+        />
       </div>
       <QuickActions
         label="+ New Customer"

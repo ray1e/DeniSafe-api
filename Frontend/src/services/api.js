@@ -19,3 +19,12 @@ export const fetchCustomerDebts = async (accountId) => {
   const payload = await res.json();
   return payload;
 };
+
+export const fetchDebtsSummary = async () => {
+  const res = await fetch("http://localhost:3000/api/v1/customers/summary/total");
+  if (!res.ok) {
+    throw new Error(`Failed to fetch debts summary: ${res.status}`);
+  }
+  const payload = await res.json();
+  return payload;
+}

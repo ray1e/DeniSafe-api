@@ -81,7 +81,7 @@ export const getAllDebtAccounts = async (req, res, next) => {
 export const getDebtAccount = async (req, res, next) => {
   try {
     const { accountId } = req.params;
-    const debtAcoount = await DebtAccount.find({ _id: accountId }).lean();
+    const debtAcoount = await DebtAccount.findById({ _id: accountId }).select("name grandTotal debts -_id").lean();
     if (!debtAcoount) {
       return res
         .status(404)

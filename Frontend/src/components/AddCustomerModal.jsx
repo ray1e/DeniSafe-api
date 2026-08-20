@@ -1,13 +1,22 @@
 import { useState } from "react";
 import DebtForm from "./DebtForm";
-import { useCustomers } from "../context/CustomerContext";
 import { useDebt } from "../context/DebtContext";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setCustomerName,
+  setCustomerNote,
+  resetCustomerForm
+} from "@/store/customerSlice"
 
 function AddCustomerModal({ isOpen, onClose }) {
-  const { customerData, setCustomerData } = useCustomers();
-  const { today, debtData, dateTaken, setDateTaken } = useDebt();
+  const { debtData, dateTaken } = useDebt();
+  const dispatch = useDispatch();
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
   const [missingMessage, setMissingMessage] = useState("");
+
+  const customerData = useSelector(
+    (state) => state.customer.customerData,
+  );
 
   if (!isOpen) return null;
 
@@ -59,6 +68,7 @@ function AddCustomerModal({ isOpen, onClose }) {
 
       const result = await res.json();
       console.log(result);
+      dispatch(resetCustomerForm());
       onClose();
     } catch (error) {
       console.error("Error creating debt:", error);
@@ -89,7 +99,8 @@ function AddCustomerModal({ isOpen, onClose }) {
                 type="text"
                 value={customerData.name}
                 onChange={(e) =>
-                  setCustomerData({ ...customerData, name: e.target.value })
+                  //setCustomerData({ ...customerData, name: e.target.value })
+                  dispatch(setCustomerName(e.target.value))
                 }
                 placeholder="e.g. Collins Kimani"
                 className="w-full bg-white rounded-md border border-brand-border px-3 py-2 text-sm focus:border-brand-primary focus:outline-none "
@@ -105,7 +116,8 @@ function AddCustomerModal({ isOpen, onClose }) {
                 value={customerData.note}
                 placeholder="e.g. Paid Ksh 200, upfront"
                 onChange={(e) =>
-                  setCustomerData({ ...customerData, note: e.target.value })
+                  //setCustomerData({ ...customerData, note: e.target.value })
+                  dispatch(setCustomerNote(e.target.value))
                 }
                 className="w-full rounded-md border border-brand-border px-3 py-2 text-sm focus:border-brand-primary focus:outline-none"
               />

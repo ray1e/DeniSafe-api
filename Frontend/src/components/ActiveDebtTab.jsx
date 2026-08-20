@@ -2,15 +2,21 @@ import { useCustomers } from "@/context/CustomerContext";
 import { useDebt } from "@/context/DebtContext";
 import { fetchCustomerDebts } from "@/services/api";
 import { useEffect, useState } from "react";
+import {useSelector} from "react-redux"
 
 function ActiveDebtTab() {
-  const { selectedCustomerId } = useCustomers();
+  //const { selectedCustomerId } = useCustomers();
 
   const [loading, setLoading] = useState(false);
   const [debtsData, setDebtsData] = useState(null);
   const { setCurrentDebtCount } = useDebt();
   const { setEarliestDate, earliestDate } = useCustomers();
 
+ 
+  const selectedCustomerId = useSelector(
+    (state) => state.customer.selectedCustomerId
+  );
+  
   // runs every time the customer selected changes
   useEffect(() => {
     if (!selectedCustomerId) {

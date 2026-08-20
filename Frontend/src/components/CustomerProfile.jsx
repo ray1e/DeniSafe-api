@@ -3,14 +3,19 @@ import CustomerStat from "./CustomerStat";
 import StatusTabs from "./StatusTabs";
 import { useCustomers } from "@/context/CustomerContext";
 import { useDebt } from "@/context/DebtContext";
+import { useSelector } from "react-redux";
 
 function CustomerProfile({ onOpenDebtModal }) {
   const [loading, setLoading] = useState(true);
   const [debtAccount, setDebtAccount] = useState([]);
   const [error, setError] = useState(null);
   const { setSelectedCustomerData } = useCustomers();
-  const { selectedCustomerId, earliestDate } = useCustomers();
+  const { earliestDate } = useCustomers();
   const { currentDebtCount } = useDebt();
+
+  const selectedCustomerId = useSelector(
+    (state) => state.customer.selectedCustomerId
+  );
   
 
   useEffect(() => {

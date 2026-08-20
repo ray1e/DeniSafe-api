@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import { fetchAllDebtAccounts } from "../services/api";
 import { useCustomers } from "@/context/CustomerContext";
+import { setSelectedCustomerId } from "@/store/customerSlice";
+
 
 function CustomerListing() {
   const [debts, setDebts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const {setSelectedCustomerId, activeDebtors, setActiveDebtors} = useCustomers();
+  const { setActiveDebtors } = useCustomers();
 
+  const dispatch = useDispatch();
 
   useEffect(() => {
     let isMounted = true;
@@ -20,12 +23,11 @@ function CustomerListing() {
           setDebts(debtResponse.data ?? []);
           setActiveDebtors(debtResponse.data.length)
         } else if (isMounted) {
-          setError("Failed to get debts");
+          console.error("Failed to get debts");
         }
       } catch (err) {
         if (isMounted) {
           console.error(err);
-          setError("Failed to get debts");
         }
       } finally {
         if (isMounted) {
@@ -39,7 +41,7 @@ function CustomerListing() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [setActiveDebtors]);
 
   //Grab initials for customer names
   const getInitials = (name) => {
@@ -71,7 +73,7 @@ function CustomerListing() {
           debts.map((debt) => {
             const initials = getInitials(debt.name);
             return (
-              <div key={debt._id} onClick={() => setSelectedCustomerId(debt._id)} className="flex p-3 border-b border-brand-items-separator cursor-default justify-between hover:bg-brand-card">
+              <div key={debt._id} onClick={() => dispatch(setSelectedCustomerId(debt._id))} className="flex p-3 border-b border-brand-items-separator cursor-default justify-between hover:bg-brand-card">
                 <div className="flex gap-3">
                   {/*Initials avatar*/}
                   <span className="flex w-8 h-8 rounded-full bg-blue-700 justify-center items-center text-xs text-white">

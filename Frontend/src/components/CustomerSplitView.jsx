@@ -1,11 +1,10 @@
 import ActiveDebtTab from "./ActiveDebtTab";
 import CustomerListing from "./CustomerListing";
 import CustomerProfile from "./CustomerProfile";
-import { useState } from "react";
 import { useCustomers } from "@/context/CustomerContext";
 
 function CustomerSplitView({onOpenDebtModal}) {
-    const {selectedCustomerId, setSelectedCustomerId} = useCustomers();
+    const {selectedCustomerId} = useCustomers();
   return (
 
     <div className="flex flex-col md:flex-row w-full min-h-screen ">

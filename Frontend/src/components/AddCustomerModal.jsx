@@ -5,8 +5,9 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   setCustomerName,
   setCustomerNote,
-  resetCustomerForm
-} from "@/store/customerSlice"
+  resetCustomerForm,
+} from "@/store/customerSlice";
+import { useCreateCustomerMutation } from "@/store/customerApi";
 
 function AddCustomerModal({ isOpen, onClose }) {
   const { debtData, dateTaken } = useDebt();
@@ -14,9 +15,10 @@ function AddCustomerModal({ isOpen, onClose }) {
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
   const [missingMessage, setMissingMessage] = useState("");
 
-  const customerData = useSelector(
-    (state) => state.customer.customerData,
-  );
+  const customerData = useSelector((state) => state.customer.customerData);
+
+  const [createCustomer, { isLoading: isCreatingCustomer, isError, error }] =
+    useCreateCustomerMutation();
 
   if (!isOpen) return null;
 
@@ -35,7 +37,6 @@ function AddCustomerModal({ isOpen, onClose }) {
         quantity: Number(item.quantity) || 1,
       })),
     };
-    
 
     const error =
       customerData.name.trim() === ""
@@ -53,21 +54,9 @@ function AddCustomerModal({ isOpen, onClose }) {
     if (error) return;
 
     try {
-      console.log("Sending items:", payload);
-      const res = await fetch("http://localhost:3000/api/v1/customers", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
+      const response = await createCustomer(payload).unwrap();
+      console.log("Full response:", response);
 
-      if (!res.ok) {
-        throw new Error(`Failed to create debt: ${res.status}`);
-      }
-
-      const result = await res.json();
-      console.log(result);
       dispatch(resetCustomerForm());
       onClose();
     } catch (error) {
@@ -137,9 +126,10 @@ function AddCustomerModal({ isOpen, onClose }) {
               </button>
               <button
                 type="submit"
+                disabled={isCreatingCustomer}
                 className={`rounded-md  px-4 py-2 text-sm font-normal bg-brand-primary text-white hover:bg-brand-primary-hover cursor-pointer`}
               >
-                Save Customer
+                {isCreatingCustomer ? "Saving.." : "Save Customer"}
               </button>
             </div>
           </form>

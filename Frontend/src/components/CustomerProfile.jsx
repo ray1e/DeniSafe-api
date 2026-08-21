@@ -1,56 +1,60 @@
-import { useEffect, useState } from "react";
 import CustomerStat from "./CustomerStat";
 import StatusTabs from "./StatusTabs";
-import { useCustomers } from "@/context/CustomerContext";
-import { useDebt } from "@/context/DebtContext";
 import { useSelector } from "react-redux";
+import { useGetCustomerQuery } from "@/store/customerApi";
 
 function CustomerProfile({ onOpenDebtModal }) {
-  const [loading, setLoading] = useState(true);
-  const [debtAccount, setDebtAccount] = useState([]);
-  const [error, setError] = useState(null);
-  const { setSelectedCustomerData } = useCustomers();
-  const { earliestDate } = useCustomers();
-  const { currentDebtCount } = useDebt();
+  //const [loading, setLoading] = useState(true);
+  // const [debtAccount, setDebtAccount] = useState([]);
+  //const [error, setError] = useState(null);
+  //const { setSelectedCustomerData } = useCustomers();
+  //const { earliestDate } = useCustomers();
+  //const { currentDebtCount } = useDebt();
 
   const selectedCustomerId = useSelector(
-    (state) => state.customer.selectedCustomerId
+    (state) => state.customer.selectedCustomerId,
   );
-  
 
-  useEffect(() => {
-    if (!selectedCustomerId) return;
+  const {
+    data: customerResponse,
+    isLoading,
+    isError,
+    error,
+  } = useGetCustomerQuery(selectedCustomerId, {
+    skip: !selectedCustomerId,
+  });
 
-    const getDebts = async () => {
-      setLoading(true);
-      setError(null);
-      //fetch customer debts
-      try {
-        const debtResponse = await fetch(
-          `http://localhost:3000/api/v1/customers/${selectedCustomerId}`,
-        );
-        const debtData = await debtResponse.json();
-        if (debtResponse.ok && debtData?.success) {
-          setDebtAccount(debtData?.data || []);
-          setSelectedCustomerData(debtData?.data || []);
-        } else {
-          setError("Failed to get debts for this customer");
-        }
-      } catch (err) {
-        console.error(err);
-        setError("Failed to get debts for this customer");
-      } finally {
-        setLoading(false);
-      }
-    };
-    getDebts();
-  }, [selectedCustomerId]);
+  const customer = customerResponse?.data;
+  const customerName = customer?.name || "Customer";
+  const grandTotal = (customer?.grandTotal ?? 0).toLocaleString("en-KE", {
+    style: "currency",
+    currency: "KES",
+  });
+  const activeDebtCount = customer?.debts.length ?? 0;
 
-  const customerName =
-    debtAccount.length > 0 ? debtAccount[0].name : "Customer";
-  const grandTotal = (
-    debtAccount.length > 0 ? (debtAccount[0].grandTotal ?? 0) : 0
-  ).toLocaleString("en-KE", { style: "currency", currency: "KES" });
+  const convertDateToString = (customer) => {
+    if (!customer?.debts?.length) {
+      return "N/A";
+    }
+
+    const dates = customer.debts
+      .map((debt) => {
+        return new Date(debt.dateTaken).getTime();
+      })
+      .filter((value) => !Number.isNaN(value))
+      .sort((a, b) => a - b);
+
+    if (!dates.length) {
+      return "N/A";
+    }
+    return new Date(dates[0]).toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+      timeZone: "UTC",
+    });
+  };
+  const earliestDate = convertDateToString(customer);
 
   return (
     <div className="flex flex-col gap-1">
@@ -76,13 +80,13 @@ function CustomerProfile({ onOpenDebtModal }) {
       {/*customer stats */}
       <div className="flex flex-row gap-4 border-b border-brand-items-separator py-2 p-4">
         <CustomerStat
-          value={currentDebtCount ?? 0}
-          label={currentDebtCount > 1 ? "active debts" : "active debt"}
+          value={activeDebtCount}
+          label={activeDebtCount > 1 ? "active debts" : "active debt"}
         />
         <div className="h-4 w-px bg-slate-200" aria-hidden="true" />
         <CustomerStat value="1" label="paid" />
         <div className="h-4 w-px bg-slate-200" aria-hidden="true" />
-        <CustomerStat label={`since ${earliestDate}`} />
+        <CustomerStat label={`since ${earliestDate} `} />
       </div>
 
       {/*customer debt history */}

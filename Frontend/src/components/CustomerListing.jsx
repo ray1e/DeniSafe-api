@@ -52,7 +52,7 @@ function CustomerListing() {
   };
 
   return (
-    <div className="flex flex-col border-r border-brand-items-separator bg-gray-100">
+    <div className="flex flex-col border-r h-full min-h-0 border-brand-items-separator bg-gray-100 overflow-hidden">
       <form className="p-3 border-b border-brand-items-separator">
         <input
           className="focus:outline-none focus:border-transparent px-3 py-2 focus:ring-1 focus:ring-red-300 w-full text-sm bg-slate-50 rounded-md text-slate-900 transition-all"
@@ -60,7 +60,7 @@ function CustomerListing() {
           placeholder="Search customers..."
         />
       </form>
-      <div className="overflow-y-auto flex-1">
+      <div className=" flex-1 min-h-0 overflow-y-auto">
         {loading ? (
           <div className="p-4 text-xs text-slate-500 text-center">
             Loading debts...

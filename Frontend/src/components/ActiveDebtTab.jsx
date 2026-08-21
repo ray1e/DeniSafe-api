@@ -1,101 +1,18 @@
-import { useCustomers } from "@/context/CustomerContext";
-import { useDebt } from "@/context/DebtContext";
-import { fetchCustomerDebts } from "@/services/api";
-import { useEffect, useState } from "react";
-import {useSelector} from "react-redux"
+import { useSelector } from "react-redux";
+import { useGetCustomerQuery } from "@/store/customerApi";
+import { formatDate } from "@/utils/dateFormatter";
+
+
 
 function ActiveDebtTab() {
-  //const { selectedCustomerId } = useCustomers();
-
-  const [loading, setLoading] = useState(false);
-  const [debtsData, setDebtsData] = useState(null);
-  const { setCurrentDebtCount } = useDebt();
-  const { setEarliestDate, earliestDate } = useCustomers();
-
- 
   const selectedCustomerId = useSelector(
-    (state) => state.customer.selectedCustomerId
+    (state) => state.customer.selectedCustomerId,
   );
-  
-  // runs every time the customer selected changes
-  useEffect(() => {
-    if (!selectedCustomerId) {
-      setDebtsData(null);
-      return;
-    }
 
-    let isMounted = true;
-    setLoading(true);
-
-    const loadCustomerDebts = async () => {
-      try {
-        const response = await fetchCustomerDebts(selectedCustomerId);
-        if (isMounted && response?.success) {
-          const { grandTotal, debts = [] } = response.data;
-          const normalizedDebts = debts.map((debt) => ({
-            ...debt,
-            formattedDate: new Date(debt.dateTaken).toLocaleDateString(
-              "en-GB",
-              {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-                timeZone: "UTC",
-              },
-            ),
-          }));
-          setDebtsData({
-            grandTotal,
-            debts: normalizedDebts,
-          });
-        } else if (isMounted) {
-          console.error("Failed to fetch customer debts");
-        }
-      } catch (err) {
-        console.error("error retrieving debts", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadCustomerDebts();
-    return () => {
-      isMounted = false;
-    };
-  }, [selectedCustomerId]);
-
-  const { grandTotal, debts = [] } = debtsData || {};
-
-  useEffect(() => {
-    setCurrentDebtCount(debts?.length ?? 0);
-  }, [debts, setCurrentDebtCount]);
-
-  useEffect(() => {
-    if (!debts || debts.length === 0) {
-      setEarliestDate(null);
-      return;
-    }
-
-    const allDates = debts
-      .map((debt) => new Date(debt.dateTaken).getTime())
-      .filter((value) => !Number.isNaN(value))
-      .sort((a, b) => a - b);
-
-    if (allDates.length === 0) {
-      setEarliestDate(null);
-      return;
-    }
-
-    const earliest = new Date(allDates[0]);
-    setEarliestDate(
-      earliest.toLocaleDateString("en-GB", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-        timeZone: "UTC",
-      }),
-    );
-  }, [debts, setEarliestDate]);
+  const { data: customerResponse, isLoading } = useGetCustomerQuery(
+    selectedCustomerId,
+    { skip: !selectedCustomerId },
+  );
 
   if (!selectedCustomerId) {
     return (
@@ -107,7 +24,7 @@ function ActiveDebtTab() {
     );
   }
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center h-full p-8 text-gray-500">
         <p className="text-sm font-medium animate-pulse">Loading debts...</p>
@@ -115,6 +32,8 @@ function ActiveDebtTab() {
     );
   }
 
+  const { debts = [] } = customerResponse?.data || {};
+  
   return (
     <>
       {!Array.isArray(debts) || debts.length === 0 ? (
@@ -132,7 +51,7 @@ function ActiveDebtTab() {
               <div className="flex flex-row p-2 gap-6 items-center  border-b border-brand-items-separator">
                 <span className="text-gray-500 text-sm">{`# ${String(index + 1).padStart(3, "0")}`}</span>
                 <span className="text-gray-500 text-sm">
-                  {debt.formattedDate}
+                  {formatDate(debt.dateTaken)}
                 </span>
                 <span className="border-red-200 border font-medium bg-red-100 text-brand-action rounded-xs text-xs px-2">
                   {`${debt.items.length} ${debt.items.length > 1 ? "items" : "item"}`}

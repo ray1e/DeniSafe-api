@@ -12,12 +12,12 @@ function FullCustomerDashboard() {
   const {isDebtModalOpen, closeDebtModal} = useModal();
   const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false)
   return (
-    <div>
-      <div>
+    <div className="flex flex-col h-screen overflow-hidden">
+      <div className="shrink-0">
         <Header onOPenAddCustomer={() => setIsCustomerModalOpen(true)}/>
       </div>
 
-      <div>
+      <div className="min-h-0 flex-1">
         <CustomerSplitView/>
       </div>
 

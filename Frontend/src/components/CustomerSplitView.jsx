@@ -17,8 +17,8 @@ function CustomerSplitView({ onOpenDebtModal }) {
   );
 
   return (
-    <div className="flex flex-col md:flex-row w-full min-h-screen ">
-      <div className="md:w-85 md:shrink-0 w-full">
+    <div className="flex h-full min-h-0 w-full flex-col md:flex-row">
+      <div className="h-full min-h-0 md:w-85 md:shrink-0">
         <CustomerListing />
       </div>
 

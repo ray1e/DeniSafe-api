@@ -3,7 +3,7 @@ import CustomerListing from "./CustomerListing";
 import CustomerProfile from "./CustomerProfile";
 import { useCustomers } from "@/context/CustomerContext";
 import { useSelector } from "react-redux";
-import {useGetCustomerQuery} from "@/store/customerApi"
+import { useGetCustomerQuery } from "@/store/customerApi";
 
 function CustomerSplitView({ onOpenDebtModal }) {
   //const {selectedCustomerId} = useCustomers();
@@ -11,10 +11,12 @@ function CustomerSplitView({ onOpenDebtModal }) {
     (state) => state.customer.selectedCustomerId,
   );
 
-  const { data: customerResponse, isLoading, isError, error } = useGetCustomerQuery(
-    selectedCustomerId,
-    { skip: !selectedCustomerId },
-  );
+  const {
+    data: customerResponse,
+    isLoading,
+    isError,
+    error,
+  } = useGetCustomerQuery(selectedCustomerId, { skip: !selectedCustomerId });
 
   return (
     <div className="flex h-full min-h-0 w-full flex-col md:flex-row">
@@ -22,9 +24,13 @@ function CustomerSplitView({ onOpenDebtModal }) {
         <CustomerListing />
       </div>
 
-      <div className="flex-1 min-w-0 gap-3 flex flex-col">
-        <CustomerProfile />
-        <ActiveDebtTab />
+      <div className="flex-1 min-w-0 min-h-0 h-full gap-3 flex flex-col ">
+        <div>
+          <CustomerProfile className="shrink-0" />
+        </div>
+        <div className="flex-1 min-h-0 overflow-y-auto">
+          <ActiveDebtTab />
+        </div>
       </div>
     </div>
   );

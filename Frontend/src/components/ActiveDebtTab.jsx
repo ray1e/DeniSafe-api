@@ -44,7 +44,7 @@ function ActiveDebtTab() {
         debts.map((debt, index) => {
           return (
             <div
-              className="rounded-md border-slate-200 border shadow-md ml-4 mr-4"
+              className="rounded-md border-slate-200 border shadow-md ml-4 mr-4 mb-4 "
               key={debt._id}
             >
               {/*date and  item count */}

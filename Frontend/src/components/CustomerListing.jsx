@@ -1,49 +1,40 @@
-import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { fetchAllDebtAccounts } from "../services/api";
-import { useCustomers } from "@/context/CustomerContext";
 import { setSelectedCustomerId } from "@/store/customerSlice";
-
+import { useGetAllCustomersQuery } from "@/store/customerApi";
 
 function CustomerListing() {
-  const [debts, setDebts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const { setActiveDebtors } = useCustomers();
-
   const dispatch = useDispatch();
+  const { data: debts, isLoading, isError, error } = useGetAllCustomersQuery();
 
-  useEffect(() => {
-    let isMounted = true;
+  if (isLoading) {
+    return (
+      <div className="flex flex-col border-r h-full min-h-0 border-brand-items-separator bg-gray-100 overflow-hidden">
+        <div className=" flex flex-1 min-h-0 justify-center items-center">
+          <div className="p-4 text-sm text-slate-500 text-center font-semibold">
+            Loading debts...
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-    const loadDebts = async () => {
-      try {
-        const debtResponse = await fetchAllDebtAccounts();
+  if (isError) {
+    return (
+      <div className="flex flex-col border-r h-full min-h-0 border-brand-items-separator bg-gray-100 overflow-hidden">
+        <div className=" flex flex-1 min-h-0 justify-center items-center">
+          <div className="p-4 text-sm text-brand-warning text-center font-semibold">
+            <p>Failed to load customers!</p>
+            <p>
+              {error?.data?.message ||
+                `HTTP Error: ${error?.status || "Unknown"}`}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-        if (isMounted && debtResponse?.success) {
-          setDebts(debtResponse.data ?? []);
-          setActiveDebtors(debtResponse.data.length)
-        } else if (isMounted) {
-          console.error("Failed to get debts");
-        }
-      } catch (err) {
-        if (isMounted) {
-          console.error(err);
-        }
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    loadDebts();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [setActiveDebtors]);
-
-  //Grab initials for customer names
+  //Grab initials from customer names
   const getInitials = (name) => {
     if (!name) return "??";
     const parts = name.trim().split(" ");
@@ -61,11 +52,7 @@ function CustomerListing() {
         />
       </form>
       <div className=" flex-1 min-h-0 overflow-y-auto">
-        {loading ? (
-          <div className="p-4 text-xs text-slate-500 text-center">
-            Loading debts...
-          </div>
-        ) : debts.length === 0 ? (
+        {debts.length === 0 ? (
           <div className="p-4 text-xs text-slate-500 text-center">
             No debts found.
           </div>
@@ -73,7 +60,11 @@ function CustomerListing() {
           debts.map((debt) => {
             const initials = getInitials(debt.name);
             return (
-              <div key={debt._id} onClick={() => dispatch(setSelectedCustomerId(debt._id))} className="flex p-3 border-b border-brand-items-separator cursor-default justify-between hover:bg-brand-card">
+              <div
+                key={debt._id}
+                onClick={() => dispatch(setSelectedCustomerId(debt._id))}
+                className="flex p-3 border-b border-brand-items-separator cursor-default justify-between hover:bg-brand-card"
+              >
                 <div className="flex gap-3">
                   {/*Initials avatar*/}
                   <span className="flex w-8 h-8 rounded-full bg-blue-700 justify-center items-center text-xs text-white">
@@ -89,7 +80,7 @@ function CustomerListing() {
                       {debt.items?.length === 1 ? "item" : "items"}
                     </span>
                   </div>
-                </div>  
+                </div>
 
                 {/*total debt amount */}
                 <span className="text-brand-action text-base font-medium">

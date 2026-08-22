@@ -7,24 +7,40 @@ export const customerApi = createApi({
     baseUrl: "http://localhost:3000/api/v1",
   }),
 
-  tagTypes: ["customer"],
+  tagTypes: ["Customer"],
 
   endpoints: (builder) => ({
+    getAllCustomers: builder.query({
+      query: () => "/customers",
+
+      transformResponse: (response) => response.data,
+
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.map(({ _id }) => ({
+                type: "customer",
+                id: _id,
+              })),
+              { type: "Customer", id: "LIST" },
+            ]
+          : [{ type: "Customer", id: "LIST" }],
+    }),
+
     getCustomer: builder.query({
       query: (customerId) => `/customers/${customerId}`,
-      providesTags: (customerId) => [
-        { type: "customer", id: customerId },
-      ],
+      providesTags: (customerId) => [{ type: "Customer", id: customerId }],
     }),
+
     createCustomer: builder.mutation({
-        query: (customer) => ({
-            url: "/customers",
-            method: "POST",
-            body: customer,
-        }),
-        invalidatesTags: ["customer"],
-    })
+      query: (customer) => ({
+        url: "/customers",
+        method: "POST",
+        body: customer,
+      }),
+      invalidatesTags: [{ type: "Customer", id: "LIST" }],
+    }),
   }),
 });
 
-export const { useGetCustomerQuery, useCreateCustomerMutation } = customerApi;
+export const { useGetAllCustomersQuery, useGetCustomerQuery, useCreateCustomerMutation } = customerApi;

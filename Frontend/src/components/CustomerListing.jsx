@@ -1,6 +1,7 @@
 import { useDispatch } from "react-redux";
 import { setSelectedCustomerId } from "@/store/customerSlice";
 import { useGetAllCustomersQuery } from "@/store/customerApi";
+import { getCustomerErrorMessage } from "@/utils/errorMessages";
 
 function CustomerListing() {
   const dispatch = useDispatch();
@@ -22,11 +23,10 @@ function CustomerListing() {
     return (
       <div className="flex flex-col border-r h-full min-h-0 border-brand-items-separator bg-gray-100 overflow-hidden">
         <div className=" flex flex-1 min-h-0 justify-center items-center">
-          <div className="p-4 text-sm text-brand-warning text-center font-semibold">
-            <p>Failed to load customers!</p>
+          <div className="p-4 text-sm text-brand-text text-center font-semibold">
+            <p className="font-extrabold text-lg">Failed to load customers</p>
             <p>
-              {error?.data?.message ||
-                `HTTP Error: ${error?.status || "Unknown"}`}
+              {getCustomerErrorMessage(error)}
             </p>
           </div>
         </div>

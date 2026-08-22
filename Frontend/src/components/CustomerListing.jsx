@@ -2,6 +2,7 @@ import { useDispatch } from "react-redux";
 import { setSelectedCustomerId } from "@/store/customerSlice";
 import { useGetAllCustomersQuery } from "@/store/customerApi";
 import { getCustomerErrorMessage } from "@/utils/errorMessages";
+import { formatCurrency } from "@/utils/currencyFormatter";
 
 function CustomerListing() {
   const dispatch = useDispatch();
@@ -59,6 +60,7 @@ function CustomerListing() {
         ) : (
           debts.map((debt) => {
             const initials = getInitials(debt.name);
+             const debtCount = debt.debts?.length ?? 0;
             return (
               <div
                 key={debt._id}
@@ -76,15 +78,15 @@ function CustomerListing() {
                     <span className="text-sm">{debt.name}</span>
                     {/*debt number */}
                     <span className="text-brand-graytext text-xs">
-                      {debt.items?.length}{" "}
-                      {debt.items?.length === 1 ? "item" : "items"}
+                      {debtCount}{" "}
+                      {debtCount === 1 ? "debt" : "debts"}
                     </span>
                   </div>
                 </div>
 
                 {/*total debt amount */}
                 <span className="text-brand-action text-base font-medium">
-                  Ksh 12,000
+                  { formatCurrency(debt.grandTotal)}
                 </span>
               </div>
             );

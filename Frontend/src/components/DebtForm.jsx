@@ -1,5 +1,8 @@
 import { useDebt } from "../context/DebtContext";
 
+const INTERGER_REGEX = /^\d*$/; // Allows empty string + positive whole numbers
+const DECIMAL_REGEX = /^\d*\.?\d{0,2}$/; // Allows empty string + up to 2 decimal places
+
 function DebtForm() {
   const { debtData, setDebtData, today, dateTaken, setDateTaken } = useDebt();
 
@@ -16,20 +19,12 @@ function DebtForm() {
   const handlePriceQtyChange = (e, index, field) => {
     const value = e.target.value;
 
-    if (field === "quantity") {
-      if (value === "") {
-        updateItem(index, field, "");
-        return;
-      }
-
-      if (/^\d+$/.test(value)) {
-        updateItem(index, field, Number(value));
-      }
-      return;
-    }
-
-    if (/^\d*\.?\d*$/.test(value)) {
-      updateItem(index, field, value);
+    const isValid =
+      field === "quantity"
+        ? INTERGER_REGEX.test(value)
+        : DECIMAL_REGEX.test(value);
+    if (isValid) {
+      return updateItem(index, field, value);
     }
   };
 

@@ -1,6 +1,7 @@
 import { useSelector } from "react-redux";
 import { useGetCustomerQuery } from "@/store/customerApi";
 import { formatDate } from "@/utils/dateFormatter";
+import { formatCurrency } from "@/utils/currencyFormatter";
 
 
 
@@ -88,7 +89,7 @@ function ActiveDebtTab() {
                   TOTAL
                 </span>
                 <span className="text-brand-action text-right w-1/5">
-                  {debt.debtTotal}
+                  { formatCurrency(debt.debtTotal)}
                 </span>
                 <span className="w-14 shrink-0"></span>
               </div>
